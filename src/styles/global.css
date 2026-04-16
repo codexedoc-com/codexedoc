@@ -1,0 +1,148 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  background: #0f0f0f;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", sans-serif;
+}
+
+button {
+  background: #2d2d2d;
+  color: #e0e0e0;
+  border: 1px solid #404040;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+button:hover {
+  background: #3d3d3d;
+  border-color: #505050;
+}
+
+button:active {
+  background: #1d1d1d;
+}
+
+input[type="text"],
+input[type="password"],
+textarea {
+  background: #1a1a1a;
+  color: #e0e0e0;
+  border: 1px solid #404040;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+textarea:focus {
+  outline: none;
+  border-color: #5a9fd4;
+  box-shadow: 0 0 0 2px rgba(90, 159, 212, 0.1);
+}
+
+/* Markdown Editor Styles */
+.w-md-editor {
+  background: #0f0f0f !important;
+  border: none !important;
+}
+
+.w-md-editor-text-pre {
+  background: #0f0f0f !important;
+}
+
+.w-md-editor-preview {
+  background: #0f0f0f !important;
+}
+
+.w-md-editor-text-input {
+  color: #e0e0e0 !important;
+  background: #0f0f0f !important;
+}
+
+.w-md-editor-text-input::placeholder {
+  color: #606060 !important;
+}
+
+.w-md-editor-toolbar {
+  background: #1a1a1a !important;
+  border-bottom: 1px solid #404040 !important;
+}
+
+.w-md-editor-toolbar button {
+  color: #a0a0a0 !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+.w-md-editor-toolbar button:hover {
+  background: #2a2a2a !important;
+  color: #e0e0e0 !important;
+}
+
+.w-md-editor-toolbar-divider {
+  background: #404040 !important;
+}
+
+.w-md-editor-preview-text {
+  color: #e0e0e0 !important;
+}
+
+.w-md-editor-preview-text p {
+  color: #e0e0e0 !important;
+}
+
+.w-md-editor-preview-text h1,
+.w-md-editor-preview-text h2,
+.w-md-editor-preview-text h3,
+.w-md-editor-preview-text h4,
+.w-md-editor-preview-text h5,
+.w-md-editor-preview-text h6 {
+  color: #5a9fd4 !important;
+}
+
+.w-md-editor-preview-text a {
+  color: #5a9fd4 !important;
+}
+
+.w-md-editor-preview-text code {
+  background: #1a1a1a !important;
+  color: #6ae36a !important;
+}
+
+.w-md-editor-preview-text pre {
+  background: #1a1a1a !important;
+  border: 1px solid #404040 !important;
+}
+
+.w-md-editor-preview-text blockquote {
+  border-left: 3px solid #5a9fd4 !important;
+  color: #a0a0a0 !important;
+}
+
+.w-md-editor-preview-text table {
+  border-collapse: collapse;
+}
+
+.w-md-editor-preview-text table,
+.w-md-editor-preview-text th,
+.w-md-editor-preview-text td {
+  border: 1px solid #404040 !important;
+  color: #e0e0e0 !important;
+}
+
+.w-md-editor-preview-text th {
+  background: #1a1a1a !important;
+}
+
