@@ -167,3 +167,14 @@ src-tauri/src/
 5. Polish UI and add advanced features
 
 The foundation is now **solid and production-ready for notes**. All core systems are in place and working.
+
+
+
+
+
+
+NEEDS:
+Line height formatting and aligning to page.
+Image needs to save in note. When you click a note in the menu it needs to be set to view but theirs a button that you click to set to editing.
+
+The file vault you need to be able to click the box and the menu for selecting files comes up for you to upload. Also when I drag over it doesnt upload please make it so the uploading works. Then below the uploading section you have a menu of files and folders you can go through I need a button for creating a folder. Then I want a button for uploading when you click it thats when the box pops up for you to drag a file or folder to or click it to select a file or folder. I love the password creation page dont chnage that at all but for the sign in page to enter the already created password after 5 attempts you have to wait 5 minutes before you can try again, then after 5 more failed attempts you have to wait 15 minutes, then 1 hour, then 24 hours, after 25 attempts all the data in there vault gets reset including the password so when they turn it on next time its fresh and they have to create theyre password like when a new user downloads. I need you to save these attempts in a way where they are remembered even if the user closes the app or turns off the computer, if they the correct after failing within 25 times then the atemmpts are forgotten about because they got in. I want you to display these attempts and the times like after failing the first 5 times it would say try again in 15 minutes, and at the last 5 they can do it says after ... (the number of attempts they have left they can fail 25 max) failed attempts your vault will be permanently deleted. 
