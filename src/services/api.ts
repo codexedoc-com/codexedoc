@@ -45,3 +45,23 @@ export async function updateNote(
 export async function deleteNote(id: string): Promise<void> {
   await invoke("delete_note", { id });
 }
+
+export async function resetVault(): Promise<void> {
+  await invoke("reset_vault");
+}
+
+export async function saveVaultFile(
+  id: string,
+  metadata: string,
+  fileData: string
+): Promise<void> {
+  await invoke("save_vault_file", { id, metadata, fileData });
+}
+
+export async function loadVaultFiles(): Promise<Array<[string, string]>> {
+  return await invoke("load_vault_files");
+}
+
+export async function deleteVaultFile(id: string): Promise<void> {
+  await invoke("delete_vault_file", { id });
+}

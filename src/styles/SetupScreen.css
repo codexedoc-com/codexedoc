@@ -21,7 +21,7 @@
   font-size: 32px;
   text-align: center;
   margin-bottom: 8px;
-  color: #5a9fd4;
+  color: #1f70ed;
 }
 
 .setup-subtitle {
@@ -61,7 +61,7 @@
 
 .form-group input:focus {
   outline: none;
-  border-color: #5a9fd4;
+  border-color: #1f70ed;
   box-shadow: 0 0 0 2px rgba(90, 159, 212, 0.1);
 }
 
@@ -135,7 +135,7 @@
   padding: 14px 24px;
   font-size: 16px;
   font-weight: 600;
-  background: #5a9fd4;
+  background: #1f70ed;
   color: #fff;
   border: none;
   border-radius: 4px;
@@ -145,7 +145,7 @@
 }
 
 .setup-button:hover:not(:disabled) {
-  background: #4a8fc4;
+  background: rgba(	31, 112, 237, 0.8);
 }
 
 .setup-button:disabled {
@@ -172,5 +172,83 @@
   padding: 16px;
   background: #1a2a2a;
   border-radius: 4px;
-  border-left: 3px solid #5a9fd4;
+  border-left: 3px solid #1f70ed;
+}
+
+.generate-password-btn {
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  background: #2ecc71;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 8px;
+}
+
+.generate-password-btn:hover:not(:disabled) {
+  background: #27ae60;
+}
+
+.generate-password-btn:disabled {
+  background: #404040;
+  color: #a0a0a0;
+  cursor: not-allowed;
+}
+
+.generate-password-help {
+  text-align: center;
+  color: #a0a0a0;
+  font-size: 12px;
+  margin-bottom: 12px;
+  font-style: italic;
+}
+
+.generated-password-box {
+  background: #1a3a1a;
+  border: 2px solid #4a9a4a;
+  border-radius: 4px;
+  padding: 16px;
+  margin-bottom: 16px;
+  animation: slideDown 0.3s ease-out;
+}
+
+.generated-password-label {
+  color: #a0a0a0;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.generated-password-display {
+  background: #0f2a0f;
+  border: 1px solid #4a9a4a;
+  padding: 12px 16px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  color: #6ae36a;
+  word-break: break-all;
+  margin-bottom: 8px;
+  user-select: all;
+}
+
+.generated-password-note {
+  color: #6ae36a;
+  font-size: 12px;
+  margin: 0;
+}
+
+.security-notice {
+  text-align: center;
+  color: #ff8c8c;
+  font-size: 13px;
+  line-height: 1.6;
+  padding: 16px;
+  background: #3a1a1a;
+  border-radius: 4px;
+  border-left: 3px solid #ff8c8c;
 }

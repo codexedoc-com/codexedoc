@@ -19,6 +19,15 @@
   font-size: 16px;
   font-weight: 600;
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sidebar-title svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
 }
 
 .sidebar-new-btn {
@@ -50,8 +59,8 @@
 
 .sidebar-item.active {
   background: #2d3d4d;
-  border-left-color: #5a9fd4;
-  color: #5a9fd4;
+  border-left-color: #1f70ed;
+  color: #1f70ed;
 }
 
 .sidebar-search {

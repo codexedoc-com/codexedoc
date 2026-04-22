@@ -2,6 +2,7 @@ import { useState } from "react";
 import { setupVault } from "../services/api";
 import { validatePassword } from "../lib/passwordValidator";
 import "../styles/SetupScreen.css";
+import logo from "../assets/logo.png";
 
 export default function SetupScreen({ onSetupComplete }: { onSetupComplete: () => void }) {
   const [password, setPassword] = useState("");
@@ -9,8 +10,37 @@ export default function SetupScreen({ onSetupComplete }: { onSetupComplete: () =
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showRequirements, setShowRequirements] = useState(false);
+  const [generatedPassword, setGeneratedPassword] = useState("");
 
   const validation = validatePassword(password);
+
+  const generatePassword = () => {
+    const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const lowercase = "abcdefghijklmnopqrstuvwxyz";
+    const numbers = "0123456789";
+    const symbols = "!@#$%^&*()_+-=[]{}';:,.<>?";
+    
+    const allChars = uppercase + lowercase + numbers + symbols;
+    let newPassword = "";
+    
+    // Ensure at least one of each required type
+    newPassword += uppercase[Math.floor(Math.random() * uppercase.length)];
+    newPassword += lowercase[Math.floor(Math.random() * lowercase.length)];
+    newPassword += numbers[Math.floor(Math.random() * numbers.length)];
+    newPassword += symbols[Math.floor(Math.random() * symbols.length)];
+    
+    // Fill the rest randomly
+    for (let i = newPassword.length; i < 16; i++) {
+      newPassword += allChars[Math.floor(Math.random() * allChars.length)];
+    }
+    
+    // Shuffle the password
+    newPassword = newPassword.split('').sort(() => Math.random() - 0.5).join('');
+    
+    setPassword(newPassword);
+    setConfirmPassword(newPassword);
+    setGeneratedPassword(newPassword);
+  };
 
   const handleSetup = async () => {
     // Check password match
@@ -52,10 +82,32 @@ export default function SetupScreen({ onSetupComplete }: { onSetupComplete: () =
   return (
     <div className="setup-screen">
       <div className="setup-container">
-        <h1>🔒 Welcome to CODEXEDOC</h1>
+        <img className="logo" src={logo} alt="CODEXEDOC Logo" />
+        <h1>Welcome to CODEXEDOC</h1>
         <p className="setup-subtitle">Create a master password to secure your vault</p>
 
         <div className="setup-form">
+          <button
+            onClick={generatePassword}
+            type="button"
+            className="generate-password-btn"
+            disabled={loading}
+          >
+            ⚡ Generate Password
+          </button>
+          
+          <p className="generate-password-help">
+            Generated passwords are extremely strong but harder to remember.
+          </p>
+
+          {generatedPassword && (
+            <div className="generated-password-box">
+              <p className="generated-password-label">Generated Password:</p>
+              <div className="generated-password-display">{generatedPassword}</div>
+              <p className="generated-password-note">💾 Write this down or save it somewhere safe</p>
+            </div>
+          )}
+
           <div className="form-group">
             <label>Master Password</label>
             <input
@@ -121,6 +173,10 @@ export default function SetupScreen({ onSetupComplete }: { onSetupComplete: () =
 
         <p className="setup-info">
           💡 <strong>Tip:</strong> This password encrypts all your data. Don't forget it!
+        </p>
+        
+        <p className="security-notice">
+          🔒 <strong>Your password is only as secure as where you store it and your vault is only as secure as your password.</strong>
         </p>
       </div>
     </div>

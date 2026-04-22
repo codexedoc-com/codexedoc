@@ -48,7 +48,7 @@ input[type="text"]:focus,
 input[type="password"]:focus,
 textarea:focus {
   outline: none;
-  border-color: #5a9fd4;
+  border-color: #1f70ed;
   box-shadow: 0 0 0 2px rgba(90, 159, 212, 0.1);
 }
 
@@ -109,11 +109,11 @@ textarea:focus {
 .w-md-editor-preview-text h4,
 .w-md-editor-preview-text h5,
 .w-md-editor-preview-text h6 {
-  color: #5a9fd4 !important;
+  color: #1f70ed !important;
 }
 
 .w-md-editor-preview-text a {
-  color: #5a9fd4 !important;
+  color: #1f70ed !important;
 }
 
 .w-md-editor-preview-text code {
@@ -127,7 +127,7 @@ textarea:focus {
 }
 
 .w-md-editor-preview-text blockquote {
-  border-left: 3px solid #5a9fd4 !important;
+  border-left: 3px solid #1f70ed !important;
   color: #a0a0a0 !important;
 }
 
@@ -146,3 +146,9 @@ textarea:focus {
   background: #1a1a1a !important;
 }
 
+.logo {
+  width: 150px;
+  height: 150px;
+  padding: 10px;
+  margin: auto;
+}

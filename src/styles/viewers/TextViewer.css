@@ -1,0 +1,85 @@
+.text-viewer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background: #0f0f0f;
+}
+
+.text-viewer .viewer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: #1a1a1a;
+  border-bottom: 1px solid #404040;
+}
+
+.text-viewer .viewer-header h3 {
+  margin: 0;
+  color: #e0e0e0;
+  font-size: 16px;
+  flex: 1;
+  word-break: break-word;
+}
+
+.text-viewer .close-btn {
+  background: transparent;
+  border: none;
+  color: #a0a0a0;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.text-viewer .close-btn:hover {
+  color: #e0e0e0;
+  background: #2a2a2a;
+  border-radius: 4px;
+}
+
+.text-viewer .viewer-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  padding: 16px;
+}
+
+.text-viewer .loading,
+.text-viewer .error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: 16px;
+}
+
+.text-viewer .loading {
+  color: #a0a0a0;
+}
+
+.text-viewer .error {
+  color: #ff6b6b;
+}
+
+.text-viewer .text-content {
+  margin: 0;
+  padding: 16px;
+  background: #1a1a1a;
+  border: 1px solid #404040;
+  border-radius: 4px;
+  color: #e0e0e0;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow: auto;
+}

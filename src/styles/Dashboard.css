@@ -29,17 +29,26 @@
   cursor: pointer;
   font-size: 14px;
   transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-tab svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
 }
 
 .nav-tab:hover {
   background: transparent;
   color: #e0e0e0;
-  border-bottom-color: #5a9fd4;
+  border-bottom-color: #1f70ed;
 }
 
 .nav-tab.active {
-  color: #5a9fd4;
-  border-bottom-color: #5a9fd4;
+  color: #1f70ed;
+  border-bottom-color: #1f70ed;
 }
 
 .dashboard-content {
