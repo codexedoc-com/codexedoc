@@ -59,7 +59,11 @@ fn main() {
             commands::load_note,
             commands::update_note,
             commands::delete_note,
-            commands::reset_vault,
+            commands::save_vault_file,
+            commands::list_files,
+            commands::get_file_meta,
+            commands::load_file,
+            commands::delete_file,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
