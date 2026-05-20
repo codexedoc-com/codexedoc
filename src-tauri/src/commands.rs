@@ -6,8 +6,9 @@ use crate::core::{
     encryption::EncryptionManager,
     key_manager::set_key,
     vault::Vault,
-    models::NoteMeta,
+    models::{NoteMeta, FileMeta},
 };
+
 
 pub fn vault_exists(app_data_dir: &PathBuf) -> bool {
     let salt_path = app_data_dir.join(".salt");
@@ -194,6 +195,60 @@ pub async fn delete_note(
 ) -> Result<(), String> {
     vault
         .delete_note(id)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn save_vault_file(
+    vault: State<'_, Vault>,
+    filename: String,
+    file_data: Vec<u8>,
+) -> Result<String, String> {
+    vault
+        .save_file(filename, file_data)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn list_files(
+    vault: State<'_, Vault>
+) -> Result<Vec<FileMeta>, String> {
+    vault
+        .list_files()
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn get_file_meta(
+    vault: State<'_, Vault>,
+    id: String
+) -> Result<FileMeta, String> {
+    vault
+        .get_file_meta(id)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn load_file(
+    vault: State<'_, Vault>,
+    id: String,
+) -> Result<Vec<u8>, String> {
+    vault
+        .load_file(id)
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn delete_file(
+    vault: State<'_, Vault>,
+    id: String,
+) -> Result<(), String> {
+    vault
+        .delete_file(id)
         .await
         .map_err(|e| e.to_string())
 }

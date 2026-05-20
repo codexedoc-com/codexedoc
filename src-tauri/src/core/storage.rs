@@ -61,3 +61,41 @@ pub fn delete_note_file(id: &str) -> CodexResult<()> {
 
     Ok(())
 }
+
+pub fn get_files_dir() -> CodexResult<PathBuf> {
+    let mut path = get_vault_dir()?;
+    path.push("files");
+
+    fs::create_dir_all(&path)
+        .map_err(|e| CodexError::IoError(format!("Failed to create files dir: {}", e)))?;
+    
+    Ok(path)
+}
+
+pub fn save_vault_file(id: &str, data: &[u8]) -> CodexResult<()> {
+    let mut path = get_files_dir()?;
+    path.push(format!("{}.cdx", id));
+
+    fs::write(path, data)
+        .map_err(|e| CodexError::StorageError(format!("Failed to save file: {}", e)))
+}
+
+pub fn load_vault_file(id: &str) -> CodexResult<Vec<u8>> {
+    let mut path = get_files_dir()?;
+    path.push(format!("{}.cdx", id));
+
+    fs::read(path)
+        .map_err(|e| CodexError::StorageError(format!("Failed to load file: {}", e)))
+}
+
+pub fn delete_vault_file(id: &str) -> CodexResult<()> {
+    let mut path = get_files_dir()?;
+    path.push(format!("{}.cdx", id));
+
+    if path.exists() {
+        fs::remove_file(path)
+            .map_err(|e| CodexError::StorageError(format!("Failed to delete file: {}", e)))?;
+    }
+
+    Ok(())
+}
