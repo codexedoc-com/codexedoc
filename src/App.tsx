@@ -5,34 +5,41 @@ import Dashboard from "./components/Dashboard";
 import { checkVaultExists } from "./services/api";
 
 export default function App() {
-  const [state, setState] = useState<"loading" | "setup" | "unlock" | "dashboard">("loading");
+  const [state, setState] = useState<"loading" | "setup" | "unlock" | "dashboard">("setup");
   const [debugMessage, setDebugMessage] = useState("Initializing...");
+  const [attemptedCheck, setAttemptedCheck] = useState(false);
 
   useEffect(() => {
+    if (attemptedCheck) return; // Only check once
+
     const checkSetup = async () => {
       try {
         setDebugMessage("Checking vault...");
         const exists = await checkVaultExists();
+        console.log("Vault exists:", exists);
         setState(exists ? "unlock" : "setup");
       } catch (err) {
         console.error("Failed to check vault:", err);
         setDebugMessage(`Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
-        // Fallback to setup after 3 seconds
-        setTimeout(() => setState("setup"), 3000);
-      }
-    };
-
-    // Add a timeout to prevent hanging forever
-    const timeoutId = setTimeout(() => {
-      if (state === "loading") {
-        setDebugMessage("Initialization timeout - defaulting to setup");
         setState("setup");
       }
-    }, 10000);
+      setAttemptedCheck(true);
+    };
 
+    // Immediately try to check vault
     checkSetup();
+
+    // Fallback timeout - after 3 seconds, show setup if we haven't transitioned yet
+    const timeoutId = setTimeout(() => {
+      if (!attemptedCheck) {
+        console.log("Initialization timeout - defaulting to setup");
+        setState("setup");
+        setAttemptedCheck(true);
+      }
+    }, 3000);
+
     return () => clearTimeout(timeoutId);
-  }, []);
+  }, [attemptedCheck]);
 
   return (
     <div style={{
@@ -54,11 +61,12 @@ export default function App() {
           width: "100%",
           height: "100%",
           background: "#0f0f0f",
-          color: "#a0a0a0",
+          color: "#ffffff",
           gap: "20px"
         }}>
-          <div style={{ fontSize: "16px" }}>Loading...</div>
-          <div style={{ fontSize: "12px", color: "#606060" }}>{debugMessage}</div>
+          <div style={{ fontSize: "24px", fontWeight: "bold" }}>Initializing...</div>
+          <div style={{ fontSize: "14px", color: "#a0a0a0" }}>{debugMessage}</div>
+          <div style={{ fontSize: "12px", color: "#606060" }}>This should take a few seconds</div>
         </div>
       )}
       {state === "setup" && (
