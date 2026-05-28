@@ -52,33 +52,25 @@ EMAIL VERIFICATION (OTP)
 export const verificationCodes = pgTable("verification_codes", {
   id: uuid("id").defaultRandom().primaryKey(),
 
-  // Email receiving the OTP
   email: text("email").notNull(),
 
-  // Username being registered
-  username: varchar("username", { length: 50 }).notNull(),
+  username: text("username").notNull(),
 
-  // Hashed OTP code (never store raw code)
   codeHash: text("code_hash").notNull(),
 
-  // Failed verification attempts
   attempts: integer("attempts").default(0).notNull(),
 
-  // Number of times a code was sent
   sendCount: integer("send_count").default(1).notNull(),
 
-  // Cooldown tracking
-  lastSentAt: timestamp("last_sent_at", { mode: "date" })
-    .defaultNow()
-    .notNull(),
+  ipAddress: text("ip_address"),
 
-  // OTP expiration
-  expiresAt: timestamp("expires_at", { mode: "date" }).notNull(),
+  ipSendCount: integer("ip_send_count").default(1).notNull(),
 
-  // Creation timestamp
-  createdAt: timestamp("created_at", { mode: "date" })
-    .defaultNow()
-    .notNull(),
+  lastSentAt: timestamp("last_sent_at", { withTimezone: true }),
+
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
 /* =========================

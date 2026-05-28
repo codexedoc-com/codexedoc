@@ -4,16 +4,16 @@ import { useState, useTransition, useEffect } from "react";
 import {
   Mail,
   User,
-  Code2,
   ArrowLeft,
   ArrowRight,
-  Sparkles,
   Lock,
 } from "lucide-react";
 import Image from "next/image";
 
-import { sendVerificationCode, verifyCode } from "@/server/actions/auth";
+import { sendVerificationCode } from "@/server/actions/auth/sendVerificationCode";
+import { verifyCode } from "@/server/actions/auth/verifyCode";
 import { useRouter } from "next/navigation";
+import { Turnstile } from "@marsidev/react-turnstile";
 
 export default function AuthPage() {
   const [mode, setMode] = useState<"login" | "register">("register");
@@ -25,6 +25,7 @@ export default function AuthPage() {
 
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
 
   useEffect(() => {
     if (authenticated) {
@@ -35,13 +36,20 @@ export default function AuthPage() {
   async function handleSendCode(formData: FormData) {
     setMessage(null);
 
+    if (!turnstileToken) {
+      setMessage({ type: "error", text: "Please complete the verification" });
+      return;
+    }
+
     startTransition(async () => {
       try {
+
+        formData.set("cf-turnstile-response", turnstileToken);
         await sendVerificationCode(formData);
 
-        setEmail(formData.get("email") as string);
+        setEmail(formData.get("email")?.toString() ?? "");
         if (mode === "register") {
-          setUsername(formData.get("username") as string);
+          setUsername(formData.get("username")?.toString() ?? "");
         }
 
         setStep("code");
@@ -49,6 +57,7 @@ export default function AuthPage() {
           type: "success",
           text: "Verification code sent to your email.",
         });
+        setTurnstileToken("");
       } catch (error) {
         setMessage({
           type: "error",
@@ -63,14 +72,25 @@ export default function AuthPage() {
 
     startTransition(async () => {
       try {
-        await verifyCode(formData);
+        const result = await verifyCode(formData);
 
-        setMessage({
-          type: "success",
-          text: "Welcome to CODEXEDOC 🎉",
-        });
+        // Success case - use the message from the server
+        if (result?.success) {
+          setMessage({
+            type: "success",
+            text: result.message, // "Account created successfully!" or "Logged in successfully!"
+          });
 
-        setAuthenticated(true);
+          // Small delay so user can see the success message
+          setTimeout(() => {
+            setAuthenticated(true);
+          }, 800);
+        } else {
+          setMessage({
+            type: "error",
+            text: "Unexpected response from server",
+          });
+        }
       } catch (error) {
         setMessage({
           type: "error",
@@ -78,15 +98,15 @@ export default function AuthPage() {
         });
       }
     });
-  }
+}
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#050816] text-white">
 
       {/* Background Effects (MATCH HOMEPAGE) */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.25),transparent_40%)]" />
-      <div className="absolute left-1/2 top-0 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-cyan-500/10 blur-[140px]" />
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:70px_70px]" />
+      <div className="absolute left-1/2 top-0 h-150 w-150 -translate-x-1/2 rounded-full bg-cyan-500/10 blur-[140px]" />
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-70px_70px]" />
 
       {/* Center Layout */}
       <div className="relative z-10 flex min-h-screen items-center justify-center px-6 py-20">
@@ -114,14 +134,14 @@ export default function AuthPage() {
               {mode === "login" ? (
                 <>
                   Welcome<br />
-                  <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+                  <span className="bg-linear-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
                     Back.
                   </span>
                 </>
               ) : (
                 <>
                   Create<br />
-                  <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+                  <span className="bg-linear-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
                     Account.
                   </span>
                 </>
@@ -152,7 +172,7 @@ export default function AuthPage() {
             </div>
 
             {/* TITLE */}
-            <div className="mb-8">
+            <div className="mb-8 lg:hidden">
               <h2 className="text-4xl font-black tracking-tight">
                 {step === "email"
                   ? mode === "register"
@@ -174,6 +194,7 @@ export default function AuthPage() {
             {step === "email" && (
               <div className="mb-8 flex rounded-2xl border border-white/10 bg-white/5 p-1">
                 <button
+                  type="button"
                   onClick={() => setMode("login")}
                   className={`flex-1 rounded-xl py-3 text-sm font-semibold transition ${
                     mode === "login"
@@ -185,6 +206,7 @@ export default function AuthPage() {
                 </button>
 
                 <button
+                  type="button"
                   onClick={() => setMode("register")}
                   className={`flex-1 rounded-xl py-3 text-sm font-semibold transition ${
                     mode === "register"
@@ -201,7 +223,20 @@ export default function AuthPage() {
 
             {/* EMAIL STEP */}
             {step === "email" ? (
-              <form action={handleSendCode} className="space-y-5">
+              <form key="emailForm" action={handleSendCode} autoComplete="off" className="space-y-5">
+
+                <input
+                  type="text"
+                  name="contact_field"
+                  defaultValue=""
+                  autoComplete="off"
+                  tabIndex={-1}
+                  aria-hidden="true"
+                  style={{
+                    position: "absolute",
+                    left: "-9999px",
+                  }}
+                />
 
                 {mode === "register" && (
                   <div>
@@ -213,6 +248,7 @@ export default function AuthPage() {
                       <User className="h-5 w-5 text-indigo-300/60" />
                       <input
                         name="username"
+                        autoComplete="username"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         placeholder="your name"
@@ -233,6 +269,7 @@ export default function AuthPage() {
                     <input
                       type="email"
                       name="email"
+                      autoComplete="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="you@example.com"
@@ -244,8 +281,21 @@ export default function AuthPage() {
 
                 <input type="hidden" name="mode" value={mode} />
 
+                <div className="flex justify-center py-2">
+                  <Turnstile
+                    siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+                    onSuccess={(token) => setTurnstileToken(token)}
+                    onExpire={() => setTurnstileToken("")}
+                    onError={() => setTurnstileToken("")}
+                    options={{ 
+                      appearance: "always",
+                      theme: "dark"
+                    }}
+                  />
+                </div>
+
                 <button
-                  disabled={pending}
+                  disabled={pending || !turnstileToken}
                   className="group w-full rounded-2xl bg-indigo-500 py-4 font-semibold transition hover:bg-indigo-400 disabled:opacity-50"
                 >
                   {pending ? "Sending..." : "Send Verification Code"}
@@ -254,7 +304,7 @@ export default function AuthPage() {
               </form>
             ) : (
               /* CODE STEP */
-              <form action={handleVerifyCode} className="space-y-5">
+              <form key="codeForm" action={handleVerifyCode} autoComplete="off" className="space-y-5">
 
                 <input type="hidden" name="email" value={email} />
                 {mode === "register" && (
@@ -269,9 +319,12 @@ export default function AuthPage() {
                   <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-xl focus-within:border-indigo-500/30 transition">
                     <Lock className="h-5 w-5 text-indigo-300/60" />
                     <input
-                      name="code"
-                      maxLength={6}
+                      type="text"
+                      name="verificationCode"
+                      autoComplete="one-time-code"
                       inputMode="numeric"
+                      pattern="[0-9]*"
+                      maxLength={6}
                       placeholder="123456"
                       className="w-full bg-transparent text-2xl tracking-widest outline-none text-white/90"
                       required
