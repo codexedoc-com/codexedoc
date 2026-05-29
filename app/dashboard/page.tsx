@@ -1,53 +1,116 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { LogOut, Settings, Menu } from "lucide-react";
 import { motion } from "framer-motion";
 
-import { TodayProgress } from "./TodayProgress";
-import { SessionBreakdown } from "./SessionBreakdown";
-import { CategoriesSection } from "./CategoriesSection";
-import { ProgressAnalytics } from "./ProgressAnalytics";
-import { SkillTree } from "./SkillTree";
-import { GoalCreationFlow } from "./GoalCreationFlow";
-import { StatsOverview } from "./StatsOverview";
-import { LearningInsights } from "./LearningInsights";
+import { TodayProgress } from "@/components/TodayProgress";
+import { SessionBreakdown } from "@/components/SessionBreakdown";
+import { CategoriesSection } from "@/components/CategoriesSection";
+import { ProgressAnalytics } from "@/components/ProgressAnalytics";
+import { SkillTree } from "@/components/SkillTree";
+import { GoalCreationFlow } from "@/components/GoalCreationFlow";
+import { StatsOverview } from "@/components/StatsOverview";
+import { LearningInsights } from "@/components/LearningInsights";
+import {
+  getCurrentUser,
+  getActiveGoal,
+  getGoalCategories,
+  getTodayProgress,
+  getProgressAnalytics,
+  getStatistics,
+  getSkillTree,
+  getLearningInsights,
+  createGoalAction,
+  createLearningAreaAction,
+} from "@/server/queries/dashboardQueries";
+
+interface DashboardData {
+  user: any;
+  goal: any;
+  categories: any[];
+  todayStats: any;
+  progressStats: any;
+  statistics: any;
+  skillTree: any;
+  insights: any;
+  loading: boolean;
+}
 
 export default function DashboardPage() {
   const [showGoalCreation, setShowGoalCreation] = useState(false);
-  const [hasGoals, setHasGoals] = useState(true); // TODO: Check if user has goals
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [data, setData] = useState<DashboardData>({
+    user: null,
+    goal: null,
+    categories: [],
+    todayStats: {},
+    progressStats: {},
+    statistics: {},
+    skillTree: {},
+    insights: {},
+    loading: true,
+  });
 
-  // Mock data - replace with real data from server
-  const currentGoal = {
-    id: "1",
-    title: "Learn Mandarin Chinese",
-    dailyMinutes: 30,
-  };
+  // Load dashboard data on mount
+  useEffect(() => {
+    const loadDashboard = async () => {
+      try {
+        // For demo: using fixed user ID. In production, get from session/auth
+        const demoUserId = "demo-user-001";
 
-  const categories = [
-    { id: "1", name: "Introductions", itemCount: 5 },
-    { id: "2", name: "Family", itemCount: 12 },
-    { id: "3", name: "Food", itemCount: 8 },
-    { id: "4", name: "Travel", itemCount: 15 },
-    { id: "5", name: "Numbers", itemCount: 20 },
-  ];
+        const [user, goal, todayStats, progressStats, statistics, skillTree, insights] = await Promise.all([
+          getCurrentUser(demoUserId),
+          getActiveGoal(demoUserId),
+          getTodayProgress(demoUserId, ""),
+          getProgressAnalytics(demoUserId, ""),
+          getStatistics(demoUserId),
+          getSkillTree(demoUserId),
+          getLearningInsights(demoUserId),
+        ]);
 
-  const todayStats = {
-    reviewsDue: 24,
-    newItems: 0,
-    practiceTasks: 0,
-    streak: 17,
-  };
+        let categories = [];
+        if (goal?.id) {
+          categories = await getGoalCategories(goal.id);
+        }
 
-  const progressStats = {
-    progressPercent: 45,
-    itemsMastered: 328,
-    retentionRate: 84,
-    streak: 34,
-  };
+        setData({
+          user,
+          goal,
+          categories,
+          todayStats,
+          progressStats,
+          statistics,
+          skillTree,
+          insights,
+          loading: false,
+        });
+      } catch (error) {
+        console.error("Error loading dashboard:", error);
+        setData((prev) => ({ ...prev, loading: false }));
+      }
+    };
+
+    loadDashboard();
+  }, []);
+
+  if (data.loading) {
+    return (
+      <main className="relative min-h-screen bg-[#050816] text-white">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.25),transparent_40%)]" />
+        <div className="flex min-h-screen items-center justify-center">
+          <motion.div animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 2, repeat: Infinity }}>
+            <div className="text-center">
+              <div className="inline-block h-12 w-12 rounded-full border-4 border-indigo-500/30 border-t-indigo-500 animate-spin" />
+              <p className="mt-4 text-white/60">Loading your dashboard...</p>
+            </div>
+          </motion.div>
+        </div>
+      </main>
+    );
+  }
 
   if (showGoalCreation) {
     return (
@@ -55,13 +118,14 @@ export default function DashboardPage() {
         onClose={() => setShowGoalCreation(false)}
         onGoalCreated={() => {
           setShowGoalCreation(false);
-          setHasGoals(true);
+          // Reload data
+          window.location.reload();
         }}
       />
     );
   }
 
-  if (!hasGoals) {
+  if (!data.goal) {
     return (
       <main className="relative min-h-screen overflow-hidden bg-[#050816] text-white">
         {/* Background Effects */}
@@ -86,7 +150,7 @@ export default function DashboardPage() {
                   </span>
                 </h1>
                 <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-white/65">
-                  Create your first learning goal and start building your personal learning system. Everything begins with a clear goal.
+                  {data.user?.username}, create your first learning goal and start building your personal learning system.
                 </p>
               </div>
 
@@ -135,7 +199,7 @@ export default function DashboardPage() {
           >
             <div className="text-right">
               <p className="text-xs text-white/50">Current Goal</p>
-              <p className="text-lg font-black">{currentGoal.title}</p>
+              <p className="text-lg font-black">{data.goal?.title}</p>
             </div>
           </motion.div>
 
@@ -168,7 +232,7 @@ export default function DashboardPage() {
             animate={{ opacity: 1, y: 0 }}
             className="mb-12"
           >
-            <h2 className="text-3xl font-black sm:text-4xl">{currentGoal.title}</h2>
+            <h2 className="text-3xl font-black sm:text-4xl">{data.goal?.title}</h2>
             <p className="mt-2 text-white/60">
               Track your progress, organize your learning blueprint, and master your goal systematically.
             </p>
@@ -179,14 +243,14 @@ export default function DashboardPage() {
             {/* Left Column - Main Content */}
             <div className="lg:col-span-2 space-y-12">
               {/* Today's Progress */}
-              <TodayProgress {...todayStats} />
+              <TodayProgress {...data.todayStats} />
 
               {/* Session Breakdown */}
               <SessionBreakdown />
 
               {/* Categories */}
               <CategoriesSection
-                categories={categories}
+                categories={data.categories}
                 onCreateCategory={() => console.log("Create category")}
               />
 
@@ -197,29 +261,13 @@ export default function DashboardPage() {
             {/* Right Sidebar */}
             <div className="lg:col-span-2 space-y-6">
               {/* Progress Analytics */}
-              <ProgressAnalytics {...progressStats} />
+              <ProgressAnalytics {...data.progressStats} />
 
               {/* Stats Overview */}
-              <StatsOverview
-                totalItemsAdded={287}
-                itemsMastered={91}
-                reviewsCompleted={156}
-                minutesStudied={2340}
-                averageSessionLength={34}
-                consecutiveDaysActive={34}
-              />
+              <StatsOverview {...data.statistics} />
 
               {/* Learning Insights */}
-              <LearningInsights
-                daysOfLearning={35}
-                bestStudyTime="7:00 PM - 8:00 PM"
-                bestSessionLength={34}
-                highestRetentionDay="Tuesday"
-                lowestRetentionDay="Saturday"
-                averageRecall={86}
-                mostEffectiveMethod="Active Recall"
-                leastEffectiveMethod="Passive Reading"
-              />
+              <LearningInsights {...data.insights} />
 
               {/* Quick Stats */}
               <motion.div
