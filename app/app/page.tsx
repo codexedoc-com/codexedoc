@@ -12,6 +12,8 @@ import { SessionBreakdown } from "@/components/SessionBreakdown";
 import { CategoriesSection } from "@/components/CategoriesSection";
 import { ProgressAnalytics } from "@/components/ProgressAnalytics";
 import { SkillTree } from "@/components/SkillTree";
+import CreateCategoryModal from "@/components/CreateCategoryModal";
+import AddItemForm from "@/components/AddItemForm";
 
 import { StatsOverview } from "@/components/StatsOverview";
 import { LearningInsights } from "@/components/LearningInsights";
@@ -41,6 +43,8 @@ interface DashboardData {
 export default function DashboardPage() {
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [showAddItemModal, setShowAddItemModal] = useState(false);
   const [data, setData] = useState<DashboardData>({
     user: null,
     goal: null,
@@ -242,9 +246,21 @@ export default function DashboardPage() {
               >
                 <p className="text-sm text-white/50">Quick Actions</p>
 
-                <button className="w-full rounded-2xl bg-indigo-500 py-3 font-semibold hover:bg-indigo-400 transition">
+                <button onClick={() => setShowAddItemModal(true)} className="w-full rounded-2xl bg-indigo-500 py-3 font-semibold hover:bg-indigo-400 transition">
                   Add Knowledge
                 </button>
+
+                {showAddItemModal && (
+                  <AddItemForm
+                    userId={data.user?.id}
+                    categories={data.categories}
+                    onClose={() => setShowAddItemModal(false)}
+                    onCreated={() => {
+                      setShowAddItemModal(false);
+                      router.refresh();
+                    }}
+                  />
+                )}
 
                 <button className="w-full rounded-2xl border border-white/10 bg-white/5 py-3 font-semibold hover:bg-white/10 transition">
                   View Stats
