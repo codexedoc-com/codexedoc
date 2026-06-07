@@ -29,13 +29,19 @@ function isValidUUID(id?: string) {
 
 // Get current user (will be enhanced with auth)
 export async function getCurrentUser(userId?: string) {
-  if (!userId) {
-    // Return demo user for testing
+  // Demo mode: handle demo user IDs or missing user
+  if (!userId || userId.startsWith?.("demo-")) {
     return {
       id: "demo-user-001",
       username: "Demo Learner",
       email: "demo@codexedoc.com",
     };
+  }
+
+  // Reject obviously invalid UUIDs to avoid database errors
+  if (!isValidUUID(userId)) {
+    console.warn("getCurrentUser: invalid UUID provided:", userId);
+    return null;
   }
 
   try {
@@ -447,6 +453,12 @@ export async function createGoalAction(
   }
 ) {
   try {
+    // If running in demo mode or a non-UUID user is passed, skip DB insert
+    if (!isValidUUID(userId)) {
+      console.warn("createGoalAction: demo mode - skipping DB insert for user:", userId);
+      return { success: true, message: "Goal created (demo mode)" };
+    }
+
     const newGoal = await db.insert(goals).values({
       userId,
       title: data.title,
