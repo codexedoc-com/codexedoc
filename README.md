@@ -1,6 +1,6 @@
-# CodexEdoc
+# CODEXEDOC
 
-CodexEdoc is a comprehensive educational platform built to provide valuable resources, documentation, and collaborative content for learners and developers. Our mission is to empower the next generation through quality technical education and community-driven knowledge sharing.
+CODEXEDOC is a Learning Operating System designed to help people learn anything more effectively using proven learning science.
 
 ---
 
@@ -26,7 +26,7 @@ CodexEdoc is a comprehensive educational platform built to provide valuable reso
 
 ## Overview
 
-This platform is maintained by the CodexEdoc team, dedicated to providing quality technical documentation and educational content to empower learners worldwide.
+This platform is maintained by the Codexedoc team, dedicated to providing quality technical documentation and educational content to empower learners worldwide.
 
 ---
 
@@ -34,7 +34,7 @@ This platform is maintained by the CodexEdoc team, dedicated to providing qualit
 
 - **Next.js + TypeScript** (Development)
 - **Drizzle ORM + Neon** (Database)
-- **Shadcn + Tailwind CSS** (Styling)
+- **Lucide + Tailwind CSS** (Styling)
 - **GitHub + Vercel** (Hosting)
 
 ---
