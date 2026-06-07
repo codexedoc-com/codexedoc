@@ -3,8 +3,8 @@ import { cookies } from "next/headers";
 /**
  * Helper to set the auth cookie consistently from server code.
  */
-export function setAuthCookie(token: string) {
-  cookies().set({
+export async function setAuthCookie(token: string) {
+  (await cookies()).set({
     name: 'codexedoc_token',
     value: token,
     httpOnly: true,
