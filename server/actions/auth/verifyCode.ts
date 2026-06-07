@@ -12,7 +12,7 @@ import {
 import { hashCode } from "./utils";
 
 import jwt from "jsonwebtoken";
-import { cookies } from "next/headers";
+import { setAuthCookie } from "@/lib/setAuthCookie";
 
 export async function verifyCode(
   formData: FormData
@@ -167,15 +167,7 @@ export async function verifyCode(
     // Create JWT and set HttpOnly cookie
     try {
       const token = jwt.sign({ userId: newUser.id }, process.env.JWT_SECRET || "dev-secret", { expiresIn: '7d' });
-      cookies().set({
-        name: 'codexedoc_token',
-        value: token,
-        httpOnly: true,
-        path: '/',
-        sameSite: 'lax',
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 60 * 60 * 24 * 7,
-      });
+      setAuthCookie(token);
     } catch (e) {
       console.warn('verifyCode: failed to set auth cookie', e);
     }
@@ -212,15 +204,7 @@ export async function verifyCode(
   // Create JWT and set HttpOnly cookie
   try {
     const token = jwt.sign({ userId: existingUser.id }, process.env.JWT_SECRET || "dev-secret", { expiresIn: '7d' });
-    cookies().set({
-      name: 'codexedoc_token',
-      value: token,
-      httpOnly: true,
-      path: '/',
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24 * 7,
-    });
+    setAuthCookie(token);
   } catch (e) {
     console.warn('verifyCode: failed to set auth cookie', e);
   }
