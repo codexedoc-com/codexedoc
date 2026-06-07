@@ -95,6 +95,13 @@ export default function DashboardPage() {
     loadDashboard();
   }, []);
 
+  // Redirect to create page if no goal after loading
+  useEffect(() => {
+    if (!data.loading && !data.goal) {
+      router.replace('/app/create');
+    }
+  }, [data.loading, data.goal, router]);
+
   if (data.loading) {
     return (
       <main className="relative min-h-screen bg-[#050816] text-white">
@@ -112,12 +119,6 @@ export default function DashboardPage() {
   }
 
 
-
-  useEffect(() => {
-    if (!data.loading && !data.goal) {
-      router.replace('/app/create');
-    }
-  }, [data.loading, data.goal, router]);
 
   if (!data.goal) {
     // while redirecting, render a minimal loading state
