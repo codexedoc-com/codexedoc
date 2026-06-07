@@ -167,7 +167,7 @@ export async function verifyCode(
     // Create JWT and set HttpOnly cookie
     try {
       const token = jwt.sign({ userId: newUser.id }, process.env.JWT_SECRET || "dev-secret", { expiresIn: '7d' });
-      setAuthCookie(token);
+      await setAuthCookie(token);
     } catch (e) {
       console.warn('verifyCode: failed to set auth cookie', e);
     }
@@ -204,7 +204,7 @@ export async function verifyCode(
   // Create JWT and set HttpOnly cookie
   try {
     const token = jwt.sign({ userId: existingUser.id }, process.env.JWT_SECRET || "dev-secret", { expiresIn: '7d' });
-    setAuthCookie(token);
+    await setAuthCookie(token);
   } catch (e) {
     console.warn('verifyCode: failed to set auth cookie', e);
   }
