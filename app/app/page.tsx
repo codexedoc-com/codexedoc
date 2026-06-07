@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { LogOut, Settings, Menu } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -11,7 +12,7 @@ import { SessionBreakdown } from "@/components/SessionBreakdown";
 import { CategoriesSection } from "@/components/CategoriesSection";
 import { ProgressAnalytics } from "@/components/ProgressAnalytics";
 import { SkillTree } from "@/components/SkillTree";
-import { GoalCreationFlow } from "@/components/GoalCreationFlow";
+
 import { StatsOverview } from "@/components/StatsOverview";
 import { LearningInsights } from "@/components/LearningInsights";
 import {
@@ -23,8 +24,6 @@ import {
   getStatistics,
   getSkillTree,
   getLearningInsights,
-  createGoalAction,
-  createLearningAreaAction,
 } from "@/server/queries/dashboardQueries";
 
 interface DashboardData {
@@ -40,7 +39,7 @@ interface DashboardData {
 }
 
 export default function DashboardPage() {
-  const [showGoalCreation, setShowGoalCreation] = useState(false);
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [data, setData] = useState<DashboardData>({
     user: null,
@@ -112,56 +111,20 @@ export default function DashboardPage() {
     );
   }
 
-  if (showGoalCreation) {
-    return (
-      <GoalCreationFlow
-        onClose={() => setShowGoalCreation(false)}
-        onGoalCreated={() => {
-          setShowGoalCreation(false);
-          // Reload data
-          window.location.reload();
-        }}
-      />
-    );
-  }
+
+
+  useEffect(() => {
+    if (!data.loading && !data.goal) {
+      router.replace('/app/create');
+    }
+  }, [data.loading, data.goal, router]);
 
   if (!data.goal) {
+    // while redirecting, render a minimal loading state
     return (
-      <main className="relative min-h-screen overflow-hidden bg-[#050816] text-white">
-        {/* Background Effects */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.25),transparent_40%)]" />
-        <div className="absolute left-1/2 top-0 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-cyan-500/10 blur-[140px]" />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:70px_70px]" />
-
-        {/* Center Content */}
-        <div className="relative z-10 flex min-h-screen items-center justify-center px-6 py-20">
-          <div className="max-w-2xl text-center">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="space-y-8"
-            >
-              <div>
-                <h1 className="text-5xl font-black leading-tight sm:text-6xl">
-                  Welcome to
-                  <br />
-                  <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
-                    CODEXEDOC
-                  </span>
-                </h1>
-                <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-white/65">
-                  {data.user?.username}, create your first learning goal and start building your personal learning system.
-                </p>
-              </div>
-
-              <button
-                onClick={() => setShowGoalCreation(true)}
-                className="inline-flex items-center gap-3 rounded-2xl bg-gradient-to-r from-indigo-500 to-cyan-500 px-8 py-4 font-semibold text-white hover:shadow-lg hover:shadow-indigo-500/50 transition"
-              >
-                Create Your First Goal
-              </button>
-            </motion.div>
-          </div>
+      <main className="relative min-h-screen bg-[#050816] text-white">
+        <div className="flex min-h-screen items-center justify-center">
+          <p className="text-white/60">Redirecting to goal creation...</p>
         </div>
       </main>
     );
@@ -287,7 +250,7 @@ export default function DashboardPage() {
                 </button>
 
                 <button
-                  onClick={() => setShowGoalCreation(true)}
+                  onClick={() => router.push('/app/create')
                   className="w-full rounded-2xl border border-white/10 bg-white/5 py-3 font-semibold hover:bg-white/10 transition"
                 >
                   New Goal
