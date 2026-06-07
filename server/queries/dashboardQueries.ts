@@ -12,6 +12,15 @@ import {
 } from "@/server/db/schema";
 import { eq, and, desc, gte, lte } from "drizzle-orm";
 
+// Helper: validate UUIDs to avoid passing demo IDs into uuid columns
+function isValidUUID(id?: string) {
+  return (
+    typeof id === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)
+  );
+}
+
+
 /**
  * DASHBOARD DATA QUERIES
  * ========================
@@ -43,6 +52,7 @@ export async function getCurrentUser(userId?: string) {
 
 // Get user's active goal (most recently created)
 export async function getActiveGoal(userId: string) {
+  if (!isValidUUID(userId)) return null;
   try {
     const goal = await db.query.goals.findFirst({
       where: eq(goals.userId, userId),
@@ -58,6 +68,7 @@ export async function getActiveGoal(userId: string) {
 
 // Get all goals for a user
 export async function getUserGoals(userId: string) {
+  if (!isValidUUID(userId)) return [];
   try {
     const userGoals = await db.query.goals.findMany({
       where: eq(goals.userId, userId),
@@ -73,6 +84,7 @@ export async function getUserGoals(userId: string) {
 
 // Get categories for a goal
 export async function getGoalCategories(goalId: string) {
+  if (!isValidUUID(goalId)) return [];
   try {
     const categories = await db.query.learningAreas.findMany({
       where: eq(learningAreas.goalId, goalId),
@@ -103,6 +115,14 @@ export async function getGoalCategories(goalId: string) {
 
 // Calculate today's progress stats
 export async function getTodayProgress(userId: string, goalId: string) {
+  if (!isValidUUID(userId)) {
+    return {
+      reviewsDue: 0,
+      newItems: 0,
+      practiceTasks: 0,
+      streak: 0,
+    };
+  }
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -147,6 +167,7 @@ export async function getTodayProgress(userId: string, goalId: string) {
 
 // Calculate learning streak
 async function calculateStreak(userId: string): Promise<number> {
+  if (!isValidUUID(userId)) return 0;
   try {
     const progressRecords = await db.query.dailyProgress.findMany({
       where: eq(dailyProgress.userId, userId),
@@ -182,6 +203,14 @@ async function calculateStreak(userId: string): Promise<number> {
 
 // Calculate progress analytics
 export async function getProgressAnalytics(userId: string, goalId: string) {
+  if (!isValidUUID(userId)) {
+    return {
+      progressPercent: 0,
+      itemsMastered: 0,
+      retentionRate: 0,
+      streak: 0,
+    };
+  }
   try {
     // Get all items for this goal
     const goalItems = await db
@@ -227,6 +256,16 @@ export async function getProgressAnalytics(userId: string, goalId: string) {
 
 // Get comprehensive statistics
 export async function getStatistics(userId: string) {
+  if (!isValidUUID(userId)) {
+    return {
+      totalItemsAdded: 0,
+      itemsMastered: 0,
+      reviewsCompleted: 0,
+      minutesStudied: 0,
+      averageSessionLength: 0,
+      consecutiveDaysActive: 0,
+    };
+  }
   try {
     const allItems = await db.query.items.findMany({
       where: eq(items.userId, userId),
@@ -268,6 +307,13 @@ export async function getStatistics(userId: string) {
 
 // Build skill tree from items
 export async function getSkillTree(userId: string) {
+  if (!isValidUUID(userId)) {
+    return {
+      name: "Overall Learning",
+      percentage: 0,
+      children: [],
+    };
+  }
   try {
     const allItems = await db.query.items.findMany({
       where: eq(items.userId, userId),
@@ -329,6 +375,12 @@ function calculateTypePercentage(items: any[], types: string[]): number {
 
 // Get learning insights (after 30 days)
 export async function getLearningInsights(userId: string) {
+  if (!isValidUUID(userId)) {
+    return {
+      daysOfLearning: 0,
+      hasEnoughData: false,
+    };
+  }
   try {
     const allSessions = await db.query.studySessions.findMany({
       where: eq(studySessions.userId, userId),
