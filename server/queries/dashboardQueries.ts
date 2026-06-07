@@ -20,6 +20,10 @@ function isValidUUID(id?: string) {
   );
 }
 
+// Demo user ID used for local/demo mode operations. This is a fixed, valid UUID so demo actions
+// can create database records without violating FK constraints.
+const DEMO_USER_ID = "00000000-0000-0000-0000-000000000001";
+
 
 /**
  * DASHBOARD DATA QUERIES
@@ -32,7 +36,7 @@ export async function getCurrentUser(userId?: string) {
   // Demo mode: handle demo user IDs or missing user
   if (!userId || userId.startsWith?.("demo-")) {
     return {
-      id: "demo-user-001",
+      id: DEMO_USER_ID,
       username: "Demo Learner",
       email: "demo@codexedoc.com",
     };
@@ -453,10 +457,19 @@ export async function createGoalAction(
   }
 ) {
   try {
-    // If running in demo mode or a non-UUID user is passed, skip DB insert
+    // If running in demo mode or a non-UUID user is passed, map to a fixed demo user and ensure
+    // a demo user record exists so we can create related demo data in the DB.
     if (!isValidUUID(userId)) {
-      console.warn("createGoalAction: demo mode - skipping DB insert for user:", userId);
-      return { success: true, message: "Goal created (demo mode)" };
+      console.warn("createGoalAction: demo mode - mapping to demo user for user:", userId);
+      userId = DEMO_USER_ID;
+      try {
+        const existingDemo = await db.query.users.findFirst({ where: eq(users.email, 'demo@codexedoc.com') });
+        if (!existingDemo) {
+          await db.insert(users).values({ id: userId, username: 'Demo Learner', email: 'demo@codexedoc.com' });
+        }
+      } catch (e) {
+        console.error('Error ensuring demo user exists:', e);
+      }
     }
 
     const newGoal = await db.insert(goals).values({
