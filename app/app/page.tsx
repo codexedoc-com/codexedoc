@@ -61,18 +61,27 @@ export default function DashboardPage() {
   useEffect(() => {
     const loadDashboard = async () => {
       try {
-        // For demo: using fixed user ID. In production, get from session/auth
-        const demoUserId = "demo-user-001";
+        // Use authenticated user from server-side cookie (JWT)
+        const user = await getCurrentUser();
+        const userId = user?.id;
 
-        const [user, goal, todayStats, progressStats, statistics, skillTree, insights] = await Promise.all([
-          getCurrentUser(demoUserId),
-          getActiveGoal(demoUserId),
-          getTodayProgress(demoUserId, ""),
-          getProgressAnalytics(demoUserId, ""),
-          getStatistics(demoUserId),
-          getSkillTree(demoUserId),
-          getLearningInsights(demoUserId),
-        ]);
+        let goal = null;
+        let todayStats = {} as any;
+        let progressStats = {} as any;
+        let statistics = {} as any;
+        let skillTree = {} as any;
+        let insights = {} as any;
+
+        if (userId) {
+          [goal, todayStats, progressStats, statistics, skillTree, insights] = await Promise.all([
+            getActiveGoal(userId),
+            getTodayProgress(userId, ""),
+            getProgressAnalytics(userId, ""),
+            getStatistics(userId),
+            getSkillTree(userId),
+            getLearningInsights(userId),
+          ]);
+        }
 
         let categories = [];
         if (goal?.id) {
