@@ -12,6 +12,9 @@ import {
 } from "@/server/db/schema";
 import { eq, and, desc, gte, lte } from "drizzle-orm";
 
+import jwt from "jsonwebtoken";
+import { cookies } from "next/headers";
+
 // Helper: validate UUIDs to avoid passing demo IDs into uuid columns
 function isValidUUID(id?: string) {
   return (
@@ -33,6 +36,19 @@ const DEMO_USER_ID = "00000000-0000-0000-0000-000000000001";
 
 // Get current user (will be enhanced with auth)
 export async function getCurrentUser(userId?: string) {
+  // If no userId provided, try to read from JWT cookie
+  if (!userId) {
+    try {
+      const token = cookies().get("codexedoc_token")?.value;
+      if (token) {
+        const payload = jwt.verify(token, process.env.JWT_SECRET || "dev-secret") as any;
+        if (payload?.userId) userId = payload.userId;
+      }
+    } catch (e) {
+      console.warn("getCurrentUser: failed to verify token", e);
+    }
+  }
+
   // Demo mode: handle demo user IDs or missing user
   if (!userId || userId.startsWith?.("demo-")) {
     return {
@@ -457,17 +473,35 @@ export async function createGoalAction(
   }
 ) {
   try {
+    // Prefer authenticated user from JWT cookie if present
+    try {
+      const token = cookies().get("codexedoc_token")?.value;
+      if (token) {
+        try {
+          const payload = jwt.verify(token, process.env.JWT_SECRET || "dev-secret") as any;
+          if (payload?.userId) {
+            userId = payload.userId;
+          }
+        } catch (e) {
+          console.warn("createGoalAction: invalid auth token", e);
+        }
+      }
+    } catch (e) {
+      // cookies() may not be available in some contexts; ignore
+      console.warn("createGoalAction: failed to read auth cookie", e);
+    }
+
     // Map non-UUIDs to demo user for local dev, but do NOT seed demo data here.
     if (!isValidUUID(userId)) {
       console.warn("createGoalAction: mapping to demo user for user:", userId);
       userId = DEMO_USER_ID;
       try {
-        const existingDemo = await db.query.users.findFirst({ where: eq(users.email, 'demo@codexedoc.com') });
+        const existingDemo = await db.query.users.findFirst({ where: eq(users.email, "demo@codexedoc.com") });
         if (!existingDemo) {
-          await db.insert(users).values({ id: userId, username: 'Demo Learner', email: 'demo@codexedoc.com' });
+          await db.insert(users).values({ id: userId, username: "Demo Learner", email: "demo@codexedoc.com" });
         }
       } catch (e) {
-        console.error('Error ensuring demo user exists:', e);
+        console.error("Error ensuring demo user exists:", e);
       }
     }
 
