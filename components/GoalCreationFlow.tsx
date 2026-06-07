@@ -40,7 +40,7 @@ export function GoalCreationFlow({ onClose, onGoalCreated }: GoalCreationFlowPro
   const handleCreate = async () => {
     startTransition(async () => {
       try {
-        const userId = "demo-user-001";
+        const userId = "00000000-0000-0000-0000-000000000001";
         const result = await createGoalAction(userId, {
           title: formData.title,
           dailyMinutes: parseInt(formData.dailyMinutes.match(/\d+/)?.[0] || "30"),
