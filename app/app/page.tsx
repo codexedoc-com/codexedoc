@@ -267,7 +267,7 @@ export default function DashboardPage() {
                 </button>
 
                 <button
-                  onClick={() => router.push('/app/create')}
+                  onClick={() => router.push(`/app/create?userId=${data.user?.id}`)}
                   className="w-full rounded-2xl border border-white/10 bg-white/5 py-3 font-semibold hover:bg-white/10 transition"
                 >
                   New Goal

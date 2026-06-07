@@ -8,9 +8,10 @@ import { createGoalAction } from "@/server/queries/dashboardQueries";
 interface GoalCreationFlowProps {
   onClose?: () => void;
   onGoalCreated?: () => void;
+  userId?: string;
 }
 
-export function GoalCreationFlow({ onClose, onGoalCreated }: GoalCreationFlowProps) {
+export function GoalCreationFlow({ onClose, onGoalCreated, userId }: GoalCreationFlowProps) {
   const [step, setStep] = useState<"title" | "why" | "timeline" | "time">("title");
   const [pending, startTransition] = useTransition();
 
@@ -40,8 +41,10 @@ export function GoalCreationFlow({ onClose, onGoalCreated }: GoalCreationFlowPro
   const handleCreate = async () => {
     startTransition(async () => {
       try {
-        const userId = "00000000-0000-0000-0000-000000000001";
-        const result = await createGoalAction(userId, {
+        // Use provided userId prop when available; otherwise fall back to demo user for local dev
+        const finalUserId = userId ?? "00000000-0000-0000-0000-000000000001";
+
+        const result = await createGoalAction(finalUserId, {
           title: formData.title,
           dailyMinutes: parseInt(formData.dailyMinutes.match(/\d+/)?.[0] || "30"),
           deadline: undefined,
