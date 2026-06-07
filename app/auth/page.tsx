@@ -29,7 +29,7 @@ export default function AuthPage() {
 
   useEffect(() => {
     if (authenticated) {
-      router.push("/dashboard");
+      router.push("/app");
     }
   }, [authenticated, router]);
 

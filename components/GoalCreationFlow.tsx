@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, ArrowLeft, Sparkles } from "lucide-react";
+import { createGoalAction } from "@/server/queries/dashboardQueries";
 
 interface GoalCreationFlowProps {
   onClose?: () => void;
@@ -39,19 +40,18 @@ export function GoalCreationFlow({ onClose, onGoalCreated }: GoalCreationFlowPro
   const handleCreate = async () => {
     startTransition(async () => {
       try {
-        // TODO: Integrate with server action to create goal
-        // const result = await createGoal(userId, {
-        //   title: formData.title,
-        //   why: formData.why,
-        //   timeline: formData.timeline,
-        //   dailyMinutes: parseInt(formData.dailyMinutes.match(/\d+/)?.[0] || "30"),
-        // });
-        
-        console.log("Creating goal:", formData);
-        // Simulate success
-        setTimeout(() => {
+        const userId = "demo-user-001";
+        const result = await createGoalAction(userId, {
+          title: formData.title,
+          dailyMinutes: parseInt(formData.dailyMinutes.match(/\d+/)?.[0] || "30"),
+          deadline: undefined,
+        });
+
+        if (result?.success) {
           onGoalCreated?.();
-        }, 500);
+        } else {
+          console.error("Failed to create goal:", result?.error);
+        }
       } catch (error) {
         console.error("Failed to create goal:", error);
       }
