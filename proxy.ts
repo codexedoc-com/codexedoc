@@ -1,41 +1,44 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { jwtVerify } from 'jose';
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { jwtVerify } from "jose";
 
-// ⚠️ Put this in .env.local
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET
-);
+const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 
 export async function proxy(request: NextRequest) {
-  const pathname = request.nextUrl.pathname;
+  const { pathname } = request.nextUrl;
+  const token = request.cookies.get("codexedoc_token")?.value;
 
-  // Only protect /app routes
-  if (!pathname.startsWith('/app')) {
-    return NextResponse.next();
+  // If user is logged in and tries to access /auth, redirect to /app
+  if (pathname.startsWith("/auth") && token) {
+    try {
+      await jwtVerify(token, JWT_SECRET);
+      return NextResponse.redirect(new URL("/app", request.url));
+    } catch {
+      const res = NextResponse.redirect(new URL("/auth", request.url));
+      res.cookies.delete("codexedoc_token");
+      return res;
+    }
   }
 
-  const token = request.cookies.get('codexedoc_token')?.value;
+  // Protect /app routes
+  if (pathname.startsWith("/app")) {
+    if (!token) {
+      return NextResponse.redirect(new URL("/auth", request.url));
+    }
 
-  if (!token) {
-    return NextResponse.redirect(new URL('/auth', request.url));
+    try {
+      await jwtVerify(token, JWT_SECRET);
+      return NextResponse.next();
+    } catch {
+      const res = NextResponse.redirect(new URL("/auth", request.url));
+      res.cookies.delete("codexedoc_token");
+      return res;
+    }
   }
 
-  try {
-    await jwtVerify(token, JWT_SECRET);
-
-    // Token is valid
-    return NextResponse.next();
-  } catch (error) {
-    console.error('JWT verification failed:', error);
-
-    // Clear invalid token and redirect to auth page
-    const response = NextResponse.redirect(new URL('/auth', request.url));
-    response.cookies.delete('codexedoc_token');
-    return response;
-  }
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/app', '/app/:path*'],
+  matcher: ["/app/:path*", "/auth/:path*"],
 };

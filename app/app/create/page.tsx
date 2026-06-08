@@ -1,10 +1,13 @@
-"use client";
+import { redirect } from "next/navigation";
+import { GoalCreationFlowClientWrapper } from "@/components/GoalCreationFlowClientWrapper";
+import { getCurrentUser } from "@/server/queries/dashboardQueries";
 
-import { useRouter } from "next/navigation";
-import { GoalCreationFlow } from "@/components/GoalCreationFlow";
-
-export default function CreateGoalPage() {
-  const router = useRouter();
+export default async function CreateGoalPage() {
+  const user = await getCurrentUser();
+  const userId = user?.id;
+  if (!userId) {
+    redirect('/app');
+  }
 
   return (
     <main className="relative min-h-screen bg-[#050816] text-white">
@@ -20,10 +23,7 @@ export default function CreateGoalPage() {
         </div>
       </div>
 
-      <GoalCreationFlow
-        onClose={() => router.push('/app')}
-        onGoalCreated={() => router.push('/app')}
-      />
+      <GoalCreationFlowClientWrapper userId={userId!} />
     </main>
   );
 }
