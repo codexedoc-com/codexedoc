@@ -1,7 +1,7 @@
 import { db } from "@/server/db/db";
 import { users } from "@/server/db/schema";
 import jwt from "jsonwebtoken";
-import { cookies } from "next/headers";
+
 
 // Helper: validate UUIDs to avoid passing demo IDs into uuid columns
 export function isValidUUID(id?: string) {
@@ -18,7 +18,13 @@ export async function getCurrentUser(userId?: string) {
   // If no userId provided, try to read from JWT cookie
   if (!userId) {
     try {
-      const cookieStore = await cookies();
+      let cookieStore;
+      try {
+        const headers = await import('next/headers');
+        cookieStore = headers.cookies ? headers.cookies() : undefined;
+      } catch (e) {
+        cookieStore = undefined;
+      }
       const token = cookieStore?.get?.("codexedoc_token")?.value;
       if (token) {
         const payload = jwt.verify(token, process.env.JWT_SECRET || "dev-secret") as any;
