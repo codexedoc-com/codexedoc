@@ -20,7 +20,7 @@ export async function createGoalAction(
       let cookieStore;
       try {
         const headers = await import('next/headers');
-        cookieStore = headers.cookies ? headers.cookies() : undefined;
+        cookieStore = headers.cookies ? await headers.cookies() : undefined;
       } catch (e) {
         cookieStore = undefined;
       }
