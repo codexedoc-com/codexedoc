@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, ArrowLeft, Sparkles } from "lucide-react";
-import { createGoalAction } from "@/server/queries/app";
+import { createGoalAction } from "@/server/mutations/app";
 
 interface GoalCreationFlowProps {
   onClose?: () => void;

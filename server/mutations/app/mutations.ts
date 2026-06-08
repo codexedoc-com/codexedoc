@@ -1,9 +1,11 @@
+"use server";
+
 import { db } from "@/server/db/db";
 import { users, goals, items, reviews, dailyProgress, learningAreas } from "@/server/db/schema";
 import { eq, and } from "drizzle-orm";
 import jwt from "jsonwebtoken";
 
-import { isValidUUID, DEMO_USER_ID } from "./appAuth";
+import { isValidUUID, DEMO_USER_ID } from "@/server/actions/app/auth";
 
 // Create a goal with server action
 export async function createGoalAction(
