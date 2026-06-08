@@ -1,7 +1,8 @@
+"use server";
+
 import { db } from "@/server/db/db";
 import { users } from "@/server/db/schema";
 import jwt from "jsonwebtoken";
-
 
 // Helper: validate UUIDs to avoid passing demo IDs into uuid columns
 export function isValidUUID(id?: string) {
