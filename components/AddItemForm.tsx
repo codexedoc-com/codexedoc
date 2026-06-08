@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createItemAction } from "@/server/queries/dashboardQueries";
+import { createItemAction } from "@/server/queries/app";
 
 interface Category {
   id: string;

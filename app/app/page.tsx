@@ -26,7 +26,7 @@ import {
   getStatistics,
   getSkillTree,
   getLearningInsights,
-} from "@/server/queries/dashboardQueries";
+} from "@/server/queries/app";
 
 interface DashboardData {
   user: any;

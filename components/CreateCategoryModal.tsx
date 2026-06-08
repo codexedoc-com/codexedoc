@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Sparkles } from "lucide-react";
-import { createLearningAreaAction } from "@/server/queries/dashboardQueries";
+import { createLearningAreaAction } from "@/server/queries/app";
 
 interface Props {
   goalId: string;
