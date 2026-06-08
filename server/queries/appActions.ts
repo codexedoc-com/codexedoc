@@ -2,7 +2,7 @@ import { db } from "@/server/db/db";
 import { users, goals, items, reviews, dailyProgress, learningAreas } from "@/server/db/schema";
 import { eq, and } from "drizzle-orm";
 import jwt from "jsonwebtoken";
-import { cookies } from "next/headers";
+
 import { isValidUUID, DEMO_USER_ID } from "./appAuth";
 
 // Create a goal with server action
@@ -17,7 +17,13 @@ export async function createGoalAction(
   try {
     // Prefer authenticated user from JWT cookie if present
     try {
-      const cookieStore = await cookies();
+      let cookieStore;
+      try {
+        const headers = await import('next/headers');
+        cookieStore = headers.cookies ? headers.cookies() : undefined;
+      } catch (e) {
+        cookieStore = undefined;
+      }
       const token = cookieStore?.get?.("codexedoc_token")?.value;
       if (token) {
         try {
