@@ -8,7 +8,7 @@ import {
   dailyProgress,
   studySessions,
 } from "@/server/db/schema";
-import { eq, and, desc, gte, lte } from "drizzle-orm";
+import { eq, and, desc, gte, lte, type InferSelectModel } from "drizzle-orm";
 
 // Helper: validate UUIDs to avoid passing demo IDs into uuid columns
 function isValidUUID(id?: string) {
@@ -327,14 +327,16 @@ export async function getSkillTree(userId: string) {
   }
 }
 
+type ItemRecord = InferSelectModel<typeof items>;
+
 // Helper functions
-export function calculateMasteryPercentage(items: any[]): number {
+export function calculateMasteryPercentage(items: ItemRecord[]): number {
   if (items.length === 0) return 0;
   const masteredCount = items.filter((item) => item.masteryLevel === "mastered").length;
   return Math.round((masteredCount / items.length) * 100);
 }
 
-export function calculateTypePercentage(items: any[], types: string[]): number {
+export function calculateTypePercentage(items: ItemRecord[], types: string[]): number {
   const filtered = items.filter((item) => types.includes(item.type));
   if (filtered.length === 0) return 0;
   const masteredCount = filtered.filter((item) => item.masteryLevel === "mastered").length;

@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, ArrowLeft, Sparkles } from "lucide-react";
 import { createGoalAction } from "@/server/mutations/appMutations";
 
+type Step = "title" | "why" | "timeline" | "time";
+
 interface GoalCreationFlowProps {
   onClose?: () => void;
   onGoalCreated?: () => void;
@@ -12,7 +14,7 @@ interface GoalCreationFlowProps {
 }
 
 export function GoalCreationFlow({ onClose, onGoalCreated, userId }: GoalCreationFlowProps) {
-  const [step, setStep] = useState<"title" | "why" | "timeline" | "time">("title");
+  const [step, setStep] = useState<Step>("title");
   const [pending, startTransition] = useTransition();
 
   const [formData, setFormData] = useState({
@@ -23,18 +25,18 @@ export function GoalCreationFlow({ onClose, onGoalCreated, userId }: GoalCreatio
   });
 
   const handleNext = () => {
-    const steps = ["title", "why", "timeline", "time"];
+    const steps: Step[] = ["title", "why", "timeline", "time"];
     const currentIndex = steps.indexOf(step);
     if (currentIndex < steps.length - 1) {
-      setStep(steps[currentIndex + 1] as any);
+      setStep(steps[currentIndex + 1]);
     }
   };
 
   const handleBack = () => {
-    const steps = ["title", "why", "timeline", "time"];
+    const steps: Step[] = ["title", "why", "timeline", "time"];
     const currentIndex = steps.indexOf(step);
     if (currentIndex > 0) {
-      setStep(steps[currentIndex - 1] as any);
+      setStep(steps[currentIndex - 1]);
     }
   };
 

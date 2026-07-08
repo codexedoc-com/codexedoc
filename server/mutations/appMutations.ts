@@ -3,7 +3,7 @@
 import { db } from "@/server/db/db";
 import { users, goals, items, reviews, dailyProgress, learningAreas } from "@/server/db/schema";
 import { eq, and } from "drizzle-orm";
-import jwt from "jsonwebtoken";
+import jwt, { type JwtPayload } from "jsonwebtoken";
 
 import { getCurrentUser, isValidUUID } from "@/lib/getCurrentUser";
 
@@ -29,8 +29,8 @@ export async function createGoalAction(
       const token = cookieStore?.get?.("codexedoc_token")?.value;
       if (token) {
         try {
-          const payload = jwt.verify(token, process.env.JWT_SECRET || "dev-secret") as any;
-          if (payload?.userId) {
+          const payload = jwt.verify(token, process.env.JWT_SECRET || "dev-secret") as JwtPayload | string | null;
+          if (typeof payload === "object" && payload !== null && "userId" in payload && typeof payload.userId === "string") {
             userId = payload.userId;
           }
         } catch (e) {
