@@ -70,7 +70,7 @@ export default function HomePage() {
     <main className="relative overflow-hidden bg-[#050816] text-white">
       {/* Background Effects */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.25),transparent_40%)]" />
-      <div className="absolute left-1/2 top-0 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-cyan-500/10 blur-[140px]" />
+      <div className="absolute left-1/2 top-0 h-150 w-150 -translate-x-1/2 rounded-full bg-cyan-500/10 blur-[140px]" />
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:70px_70px]" />
 
       {/* Navbar */}
@@ -96,7 +96,7 @@ export default function HomePage() {
             </div>
           </Link>
 
-          <nav className="hidden items-center gap-10 text-sm text-white/70 md:flex">
+          {/* <nav className="hidden items-center gap-10 text-sm text-white/70 md:flex">
             <a href="#features" className="transition hover:text-white">
               Features
             </a>
@@ -106,7 +106,7 @@ export default function HomePage() {
             <a href="#analytics" className="transition hover:text-white">
               Analytics
             </a>
-          </nav>
+          </nav> */}
 
           <div className="flex items-center gap-4">
             <Link

@@ -18,29 +18,29 @@ export function SessionBreakdown() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.1 }}
-      className="rounded-3xl border border-indigo-500/20 bg-indigo-500/10 p-8 backdrop-blur-xl space-y-6"
+      className="rounded-2xl sm:rounded-3xl border border-indigo-500/20 bg-indigo-500/10 p-4 sm:p-8 backdrop-blur-xl space-y-4 sm:space-y-6"
     >
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <p className="text-sm text-indigo-200/70">Recommended Session</p>
-          <h4 className="mt-2 text-2xl font-black">{totalMinutes} Minute Focus Block</h4>
+          <p className="text-xs sm:text-sm text-indigo-200/70">Recommended Session</p>
+          <h4 className="mt-1 sm:mt-2 text-lg sm:text-2xl font-black">{totalMinutes} Minute Focus Block</h4>
         </div>
         <Target className="h-8 w-8 text-indigo-300" />
       </div>
 
       {/* Time Breakdown */}
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
         {segments.map((segment, index) => (
           <motion.div
             key={segment.label}
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 + index * 0.05 }}
-            className="rounded-2xl border border-white/10 bg-white/5 p-4 text-center"
+            className="rounded-xl sm:rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4 text-center"
           >
-            <div className={`h-1 rounded-full ${segment.color} mx-auto mb-3`} style={{ width: "24px" }} />
-            <p className="text-lg font-bold text-white">{segment.minutes}m</p>
-            <p className="mt-1 text-xs text-white/60">{segment.label}</p>
+            <div className={`h-1 rounded-full ${segment.color} mx-auto mb-2 sm:mb-3`} style={{ width: "20px" }} />
+            <p className="text-base sm:text-lg font-bold text-white">{segment.minutes}m</p>
+            <p className="mt-0.5 sm:mt-1 text-xs text-white/60">{segment.label}</p>
           </motion.div>
         ))}
       </div>

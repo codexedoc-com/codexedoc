@@ -26,6 +26,11 @@ export default function AuthPage() {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [turnstileToken, setTurnstileToken] = useState("");
+  const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim();
+  const turnstileEnabled = Boolean(turnstileSiteKey);
+  const [turnstileStatus, setTurnstileStatus] = useState<"loading" | "ready" | "error">(
+    turnstileEnabled ? "loading" : "ready"
+  );
 
   useEffect(() => {
     if (authenticated) {
@@ -33,18 +38,34 @@ export default function AuthPage() {
     }
   }, [authenticated, router]);
 
+  useEffect(() => {
+    if (!turnstileEnabled || turnstileStatus !== "loading") {
+      return;
+    }
+
+    const fallbackTimer = window.setTimeout(() => {
+      setTurnstileStatus("ready");
+    }, 5000);
+
+    return () => window.clearTimeout(fallbackTimer);
+  }, [turnstileEnabled, turnstileStatus]);
+
   async function handleSendCode(formData: FormData) {
     setMessage(null);
 
-    if (!turnstileToken) {
-      setMessage({ type: "error", text: "Please complete the verification" });
+    if (turnstileEnabled && !turnstileToken && turnstileStatus !== "ready") {
+      setTurnstileStatus("error");
+      setMessage({ type: "error", text: "Please complete the verification challenge before requesting a code." });
       return;
     }
 
     startTransition(async () => {
       try {
 
-        formData.set("cf-turnstile-response", turnstileToken);
+        if (turnstileToken) {
+          formData.set("cf-turnstile-response", turnstileToken);
+        }
+
         await sendVerificationCode(formData);
 
         setEmail(formData.get("email")?.toString() ?? "");
@@ -281,21 +302,43 @@ export default function AuthPage() {
 
                 <input type="hidden" name="mode" value={mode} />
 
-                <div className="flex justify-center py-2">
-                  <Turnstile
-                    siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
-                    onSuccess={(token) => setTurnstileToken(token)}
-                    onExpire={() => setTurnstileToken("")}
-                    onError={() => setTurnstileToken("")}
-                    options={{ 
-                      appearance: "always",
-                      theme: "dark"
-                    }}
-                  />
+                <div className="flex flex-col items-center justify-center gap-2 py-2">
+                  {turnstileEnabled ? (
+                    <>
+                      <Turnstile
+                        siteKey={turnstileSiteKey!}
+                        onSuccess={(token) => {
+                          setTurnstileToken(token);
+                          setTurnstileStatus("ready");
+                        }}
+                        onExpire={() => {
+                          setTurnstileToken("");
+                          setTurnstileStatus("loading");
+                        }}
+                        onError={() => {
+                          setTurnstileToken("");
+                          setTurnstileStatus("error");
+                        }}
+                        options={{
+                          appearance: "always",
+                          theme: "dark",
+                        }}
+                      />
+                      <p className="text-center text-sm text-white/60">
+                        {turnstileStatus === "loading" && "Waiting for verification challenge..."}
+                        {turnstileStatus === "ready" && (!turnstileToken ? "Verification challenge unavailable, continuing without it." : "Verification challenge complete.")}
+                        {turnstileStatus === "error" && "The verification challenge could not be completed. Please refresh and try again."}
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-center text-sm text-emerald-300/80">
+                      Verification challenge is not configured right now, so this step will continue without it.
+                    </p>
+                  )}
                 </div>
 
                 <button
-                  disabled={pending || !turnstileToken}
+                  disabled={pending || !email.trim() || (mode === "register" && !username.trim())}
                   className="group w-full rounded-2xl bg-indigo-500 py-4 font-semibold transition hover:bg-indigo-400 disabled:opacity-50"
                 >
                   {pending ? "Sending..." : "Send Verification Code"}

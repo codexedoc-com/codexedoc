@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { GoalCreationFlowClientWrapper } from "../../components/GoalCreationFlowClientWrapper";
-import { getCurrentUser } from "@/server/actions/app/auth";
+import { getCurrentUser } from "@/lib/getCurrentUser";
 
 export default async function CreateGoalPage() {
   const user = await getCurrentUser();

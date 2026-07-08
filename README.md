@@ -16,11 +16,9 @@ CODEXEDOC is a Learning Operating System designed to help people learn anything 
   - [4. Install Dependencies](#4-install-dependencies)
   - [5. Start Development Server](#5-start-development-server)
 - [Project Structure](#project-structure)
-- [Admin Access](#admin-access)
 - [Learn More](#learn-more)
 - [Task Management](#task-management)
 - [Project Admin](#project-admin)
-- [Credits](#credits)
 
 ---
 
@@ -76,11 +74,6 @@ All contributors to CodexEdoc must adhere to the following rules to maintain cod
 - **Never Commit `.env`**: The `.env` file must never be committed. Use `.env.example` as a template.
 - **Credentials Confidential**: Never share or commit real database credentials, API keys, or secrets.
 - **Request Missing Values**: If you need environment variable values, contact the Project Admin.
-
-### Admin Access and Permissions
-- **Request Only**: Admin credentials and access keys are provided only upon request.
-- **Credentials from Admin**: Request user IDs, passwords, and API keys from the Project Admin.
-- **Secure Handling**: Keep all credentials secure and do not share in public channels (GitHub, Discord, etc.).
 
 ### Issue Management
 - **Assign Yourself**: Only work on issues assigned to you.
@@ -280,16 +273,6 @@ This applies the generated SQL migrations to the database. If errors occur, care
 
 ---
 
-## Admin Access
-
-If your work involves admin access to the site, follow these steps:
-
-1. Request a **user ID and PASSWORD** from the [Project Admin](#project-admin)
-2. Visit `/admin` route locally or on the production site
-3. Admin routes interact with API endpoints in `/app/api`
-
----
-
 ## Learn More
 
 - [Next.js Documentation](https://nextjs.org/docs)
@@ -317,21 +300,3 @@ As you complete work or platform features:
 - **Discord**: glenniii.dev
 
 ---
-
-## Cloudflare R2 Setup (Admin Uploads)
-
-To enable file uploads (PDFs, images) to Cloudflare R2, add these environment variables to your `.env` file:
-
-- `CF_R2_ACCESS_KEY_ID` — Your R2 access key ID
-- `CF_R2_SECRET_ACCESS_KEY` — Your R2 secret access key
-- `CF_R2_ENDPOINT` — R2 endpoint URL (e.g., `https://<account>.r2.cloudflarestorage.com`)
-- `CF_R2_BUCKET` — The bucket name to use
-- `CF_R2_REGION` — Optional region (default: `auto`)
-
-The admin UI uploads files to `/api/admin/upload` and returns a public URL used by resource and content APIs.
-
----
-
-## Credits
-
-CodexEdoc is built and maintained by a collaborative team of educators, developers, and community members dedicated to advancing technical education worldwide.

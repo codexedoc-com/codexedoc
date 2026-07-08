@@ -27,7 +27,7 @@ export function ProgressAnalytics({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.1 }}
-      className="space-y-6"
+      className="space-y-4 sm:space-y-6"
     >
       {/* Header */}
       <div>
@@ -36,7 +36,7 @@ export function ProgressAnalytics({
       </div>
 
       {/* Stats Grid */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
@@ -45,12 +45,12 @@ export function ProgressAnalytics({
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2 + index * 0.08 }}
-              className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl hover:border-indigo-500/30 hover:bg-white/8 transition"
+              className="rounded-2xl sm:rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-6 backdrop-blur-xl hover:border-indigo-500/30 hover:bg-white/8 transition"
             >
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <div>
-                  <p className="text-sm text-white/50">{stat.label}</p>
-                  <h4 className="mt-3 text-3xl font-black">{stat.value}</h4>
+                  <p className="text-xs sm:text-sm text-white/50">{stat.label}</p>
+                  <h4 className="mt-2 sm:mt-3 text-2xl sm:text-3xl font-black">{stat.value}</h4>
                 </div>
                 <Icon className="h-8 w-8 text-indigo-300/40" />
               </div>
@@ -64,7 +64,7 @@ export function ProgressAnalytics({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.4 }}
-        className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl"
+        className="rounded-2xl sm:rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-6 backdrop-blur-xl"
       >
         <div className="flex items-center justify-between mb-4">
           <h4 className="font-semibold">Learning Journey</h4>

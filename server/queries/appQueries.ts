@@ -1,5 +1,3 @@
-"use server";
-
 import { db } from "@/server/db/db";
 import {
   users,
@@ -12,7 +10,13 @@ import {
 } from "@/server/db/schema";
 import { eq, and, desc, gte, lte } from "drizzle-orm";
 
-import { isValidUUID } from "./auth";
+// Helper: validate UUIDs to avoid passing demo IDs into uuid columns
+function isValidUUID(id?: string) {
+  return (
+    typeof id === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)
+  );
+}
 
 // Get user's active goal (most recently created)
 export async function getActiveGoal(userId: string) {

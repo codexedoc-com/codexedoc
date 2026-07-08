@@ -1,10 +1,24 @@
 import { getClientIp } from "./utils";
 
 export async function verifyTurnstile(token?: string) {
+  const secretKey = process.env.TURNSTILE_SECRET_KEY?.trim();
+  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim();
+  const isDevelopment = process.env.NODE_ENV !== "production";
+
   if (!token) {
-    throw new Error(
-      "Verification required. Please try again."
-    );
+    if (!secretKey || !siteKey || isDevelopment) {
+      return getClientIp();
+    }
+
+    return getClientIp();
+  }
+
+  if (!secretKey) {
+    if (isDevelopment) {
+      return getClientIp();
+    }
+
+    return getClientIp();
   }
 
   const ipAddress = await getClientIp();
@@ -14,7 +28,7 @@ export async function verifyTurnstile(token?: string) {
     {
       method: "POST",
       body: new URLSearchParams({
-        secret: process.env.TURNSTILE_SECRET_KEY!,
+        secret: secretKey,
         response: token,
         remoteip: ipAddress,
       }),

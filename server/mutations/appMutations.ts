@@ -5,7 +5,7 @@ import { users, goals, items, reviews, dailyProgress, learningAreas } from "@/se
 import { eq, and } from "drizzle-orm";
 import jwt from "jsonwebtoken";
 
-import { isValidUUID, DEMO_USER_ID } from "@/server/actions/app/auth";
+import { getCurrentUser, isValidUUID } from "@/lib/getCurrentUser";
 
 // Create a goal with server action
 export async function createGoalAction(
@@ -45,7 +45,8 @@ export async function createGoalAction(
     // Map non-UUIDs to demo user for local dev, but do NOT seed demo data here.
     if (!isValidUUID(userId)) {
       console.warn("createGoalAction: mapping to demo user for user:", userId);
-      userId = DEMO_USER_ID;
+      const currentUser = await getCurrentUser();
+      userId = currentUser?.id || userId;
       try {
         const existingDemo = await db.query.users.findFirst({ where: eq(users.email, "demo@codexedoc.com") });
         if (!existingDemo) {
@@ -84,7 +85,8 @@ export async function createItemAction(
   try {
     if (!isValidUUID(userId)) {
       console.warn("createItemAction: mapping to demo user for user:", userId);
-      userId = DEMO_USER_ID;
+      const currentUser = await getCurrentUser();
+      userId = currentUser?.id || userId;
     }
 
     if (!data.areaId) {

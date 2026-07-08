@@ -106,46 +106,46 @@ export function SkillTree() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.3 }}
-      className="space-y-6"
+      className="space-y-4 sm:space-y-6"
     >
       {/* Header */}
       <div>
-        <p className="text-sm text-white/50">Skill Mastery</p>
-        <h3 className="mt-1 text-2xl font-black">Your Skill Tree</h3>
+        <p className="text-xs sm:text-sm text-white/50">Skill Mastery</p>
+        <h3 className="mt-1 text-lg sm:text-2xl font-black">Your Skill Tree</h3>
       </div>
 
       {/* Tree Container */}
-      <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
+      <div className="rounded-2xl sm:rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-8 backdrop-blur-xl overflow-x-auto">
         <SkillItem skill={skillTreeData} depth={0} />
       </div>
 
       {/* Legend */}
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-          <p className="text-sm text-white/50">Mastery Levels</p>
-          <div className="mt-3 space-y-2">
+      <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
+        <div className="rounded-xl sm:rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
+          <p className="text-xs sm:text-sm text-white/50">Mastery Levels</p>
+          <div className="mt-2 sm:mt-3 space-y-1.5 sm:space-y-2">
             <div className="flex items-center gap-2">
-              <div className="h-2 w-6 rounded-full bg-red-500/50" />
-              <span className="text-sm text-white/70">0-25%: Learning</span>
+              <div className="h-2 w-5 rounded-full bg-red-500/50" />
+              <span className="text-xs sm:text-sm text-white/70">0-25%: Learning</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="h-2 w-6 rounded-full bg-yellow-500/50" />
-              <span className="text-sm text-white/70">25-50%: Familiar</span>
+              <span className="text-xs sm:text-sm text-white/70">25-50%: Familiar</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="h-2 w-6 rounded-full bg-cyan-500/50" />
-              <span className="text-sm text-white/70">50-75%: Strong</span>
+              <span className="text-xs sm:text-sm text-white/70">50-75%: Strong</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="h-2 w-6 rounded-full bg-green-500/50" />
-              <span className="text-sm text-white/70">75-100%: Mastered</span>
+              <span className="text-xs sm:text-sm text-white/70">75-100%: Mastered</span>
             </div>
           </div>
         </div>
 
-        <div className="rounded-2xl border border-indigo-500/20 bg-indigo-500/10 p-4">
-          <p className="text-sm text-indigo-200">💡 Tip</p>
-          <p className="mt-2 text-sm text-indigo-200/80">
+        <div className="rounded-2xl border border-indigo-500/20 bg-indigo-500/10 p-3 sm:p-4">
+          <p className="text-xs sm:text-sm text-indigo-200">💡 Tip</p>
+          <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-indigo-200/80">
             Focus on areas below 50% to unlock faster growth. Your weakest skills deserve the most attention.
           </p>
         </div>
