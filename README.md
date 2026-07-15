@@ -8,6 +8,7 @@
 
 - [Overview](#overview)
 - [Tech Stack](#tech-stack)
+- [License](#license)
 - [Contributor Ruleset](#contributor-ruleset)
 - [Getting Started](#getting-started)
   - [1. Prerequisites](#1-prerequisites)
@@ -36,6 +37,31 @@ This platform is maintained by the **CodexEdoc** team, dedicated to providing qu
 - **Database:** Drizzle ORM + Neon
 - **Styling:** Tailwind CSS + Lucide Icons
 - **Hosting:** GitHub + Vercel
+
+---
+
+# License
+
+Copyright © 2026 CODEXEDOC
+
+CODEXEDOC is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0-or-later).**
+
+This means you are free to:
+
+- Use the software
+- Study the source code
+- Modify the software
+- Share copies
+- Contribute improvements
+
+Under the following conditions:
+
+- Any distributed modifications must also be licensed under the AGPL.
+- Copyright notices and license notices must be preserved.
+- If you operate a modified version of CODEXEDOC as a network service (such as a website or SaaS), you must make the corresponding source code available to users of that service.
+- This software is provided without warranty.
+
+The full license text is available in the `LICENSE` file.
 
 ---
 
