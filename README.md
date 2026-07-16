@@ -1,42 +1,80 @@
 # CODEXEDOC
 
+![License](https://img.shields.io/github/license/codexedoc-com/codexedoc)
+![Issues](https://img.shields.io/github/issues/codexedoc-com/codexedoc)
+![Contributors](https://img.shields.io/github/contributors/codexedoc-com/codexedoc)
+![Stars](https://img.shields.io/github/stars/codexedoc-com/codexedoc)
+
 **CODEXEDOC** is a Learning Operating System designed to help people learn anything more effectively using proven learning science.
 
 ---
 
 # Table of Contents
 
-- [Overview](#overview)
-- [Tech Stack](#tech-stack)
-- [License](#license)
-- [Contributor Ruleset](#contributor-ruleset)
-- [Getting Started](#getting-started)
-  - [1. Prerequisites](#1-prerequisites)
-  - [2. Clone & Setup](#2-clone--setup)
-  - [3. Configure Environment](#3-configure-environment)
-  - [4. Install Dependencies](#4-install-dependencies)
-  - [5. Start Development Server](#5-start-development-server)
-- [Project Structure](#project-structure)
-- [Database](#database)
-- [Application Versioning](#application-versioning)
-- [Learn More](#learn-more)
-- [Task Management](#task-management)
-- [Project Admin](#project-admin)
+* [Overview](#overview)
+* [Why CODEXEDOC?](#why-codexedoc)
+* [Tech Stack](#tech-stack)
+* [License](#license)
+* [Getting Started](#getting-started)
+  * [1. Prerequisites](#1-prerequisites)
+  * [2. Clone & Setup](#2-clone--setup)
+  * [3. Configure Environment](#3-configure-environment)
+  * [4. Install Dependencies](#4-install-dependencies)
+  * [5. Start Development Server](#5-start-development-server)
+* [Project Architecture](#project-architecture)
+* [Database](#database)
+* [Community](#community)
+* [Documentation](#Documentation)
+* [Learn More](#learn-more)
+* [Acknowledgements](#acknowledgements)
 
 ---
 
 # Overview
 
-This platform is maintained by the **CodexEdoc** team, dedicated to providing quality technical documentation and educational content to empower learners worldwide.
+CODEXEDOC is more than a flashcard app or note-taking tool.
+
+It is a **Learning Operating System** that helps users organize, retain, and master knowledge through evidence-based learning methods.
+
+Rather than replacing books, courses, videos, or teachers, CODEXEDOC provides the system that connects them together by helping users:
+
+* Define learning goals
+* Organize knowledge
+* Practice active recall
+* Schedule spaced repetition
+* Build consistent learning habits
+* Track long-term mastery
+
+Whether you're learning a language, studying for an exam, becoming a software developer, or building professional skills, CODEXEDOC provides the framework that turns learning into a repeatable process.
+
+---
+
+## Features
+
+- 🎯 Learning goals
+- 📚 Knowledge organization
+- 🧠 Active recall
+- 🔁 Spaced repetition
+- 📈 Progress tracking
+- 🔒 Secure authentication
+- 🌐 Cross-device access
+
+--
+
+# Why CODEXEDOC?
+
+Learning resources are everywhere—but staying organized, remembering what you've learned, and building lasting habits remain difficult.
+
+CODEXEDOC brings proven learning techniques into a single platform so learners can focus on mastering knowledge instead of managing scattered notes and tools.
 
 ---
 
 # Tech Stack
 
-- **Framework:** Next.js + TypeScript
-- **Database:** Drizzle ORM + Neon
-- **Styling:** Tailwind CSS + Lucide Icons
-- **Hosting:** GitHub + Vercel
+* **Framework:** Next.js + TypeScript
+* **Database:** Drizzle ORM + Neon
+* **Styling:** Tailwind CSS + Lucide Icons
+* **Hosting:** GitHub + Vercel
 
 ---
 
@@ -44,170 +82,29 @@ This platform is maintained by the **CodexEdoc** team, dedicated to providing qu
 
 Copyright © 2026 CODEXEDOC
 
-CODEXEDOC is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0-or-later).**
+This project is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0-or-later).**
 
-This means you are free to:
-
-- Use the software
-- Study the source code
-- Modify the software
-- Share copies
-- Contribute improvements
-
-Under the following conditions:
-
-- Any distributed modifications must also be licensed under the AGPL.
-- Copyright notices and license notices must be preserved.
-- If you operate a modified version of CODEXEDOC as a network service (such as a website or SaaS), you must make the corresponding source code available to users of that service.
-- This software is provided without warranty.
-
-The full license text is available in the `LICENSE` file.
+See the `LICENSE` file for the complete license text and terms.
 
 ---
 
-# Contributor Ruleset
+# Open Source Philosophy
 
-All contributors to **Codexedoc** must adhere to the following rules to maintain code quality, consistency, and project stability.
+CODEXEDOC is proudly open source under the GNU Affero General Public License v3.0 (AGPL-3.0-or-later).
 
-## Code Quality Standards
+Our goal is to build the best Learning Operating System with the help of the community.
 
-- Write all application code in **TypeScript**.
-- No JavaScript files in critical application logic.
-- All code must pass ESLint before submission.
+Everyone is welcome to:
 
-```bash
-npm run lint
-```
+* Report bugs
+* Suggest improvements
+* Submit pull requests
+* Build new features
+* Improve documentation
 
-- Use strict TypeScript typing.
-- Avoid `any` unless absolutely necessary and documented.
-- Write tests for new features.
-- Ensure existing tests pass before opening a PR.
+The AGPL ensures that improvements made to publicly hosted versions of CODEXEDOC remain open for the benefit of the entire community.
 
----
-
-## Branching & Commit Guidelines
-
-### Branch Naming
-
-```
-user/<github_username>/<issue_number>
-```
-
-Example:
-
-```text
-user/glenniii-dev/42
-```
-
-### Commit Messages
-
-```
-[issue-number] Brief description
-```
-
-Example:
-
-```text
-[42] Add user authentication flow
-```
-
-### Pull Requests
-
-- Link related issues.
-- Include a detailed description.
-- Request review before merging.
-
----
-
-## File & Folder Standards
-
-- Learn the existing project structure before creating new files.
-- Component files use **PascalCase**.
-
-```
-UserCard.tsx
-```
-
-- Utility functions use **camelCase**.
-
-```
-getUserData.ts
-```
-
-- Folders use **kebab-case**.
-
-```
-user-components/
-```
-
-- Do not delete or restructure folders without Project Admin approval.
-
----
-
-## Database Rules
-
-- Modify schemas **only** in:
-
-```
-db/schema.ts
-```
-
-- Always use the development database.
-- Never test against production.
-- Contact the Project Admin before deleting:
-  - Tables
-  - Columns
-  - Relationships
-
-Always run:
-
-```bash
-npm run db:generate
-npm run db:migrate
-```
-
----
-
-## Environment Variables
-
-- Never commit `.env`
-- Use `.env.example`
-- Never share secrets
-- Contact the Project Admin if values are needed
-
----
-
-## Issue Management
-
-- Only work on assigned issues.
-- Keep issue status updated.
-- Close completed issues.
-- Contact the Project Admin for blockers.
-
----
-
-## Documentation
-
-- Update documentation whenever functionality changes.
-- Comment complicated logic.
-- Update this README when setup steps, dependencies, or features change.
-
----
-
-## Code Reviews
-
-- Every PR requires Project Admin approval.
-- Address review comments promptly.
-- Contributors may **not** merge their own PRs.
-
----
-
-## Communication
-
-- Ask questions when unsure.
-- Report bugs immediately.
-- Be respectful and constructive.
+We believe knowledge should grow through collaboration while ensuring improvements remain available to everyone.
 
 ---
 
@@ -217,10 +114,8 @@ npm run db:migrate
 
 Install:
 
-- Node.js (v18+)
-- Git
-
-If you experience issues, contact the Project Admin.
+* Node.js (v18+)
+* Git
 
 ---
 
@@ -233,18 +128,6 @@ git clone https://github.com/codexedoc-com/codexedoc.git
 cd codexedoc
 ```
 
-Create your feature branch:
-
-```bash
-git checkout -b user/<github_username>/<issue_number>
-```
-
-Example:
-
-```bash
-git checkout -b user/glenniii-dev/42
-```
-
 ---
 
 ## 3. Configure Environment
@@ -252,14 +135,14 @@ git checkout -b user/glenniii-dev/42
 Create a `.env` file using `.env.example`.
 
 ```env
-DATABASE_URL =
-RESEND_API_KEY =
-NEXT_PUBLIC_TURNSTILE_SITE_KEY =
-TURNSTILE_SECRET_KEY =
-JWT_SECRET =
+DATABASE_URL=
+RESEND_API_KEY=
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=
+TURNSTILE_SECRET_KEY=
+JWT_SECRET=
 ```
 
-> ⚠️ Never commit this file or share production credentials.
+> Never commit your `.env` file or share production credentials.
 
 ---
 
@@ -279,193 +162,71 @@ npm run dev
 
 Open:
 
-```
+```text
 http://localhost:3000
 ```
 
 ---
 
-# Project Structure
+# Project Architecture
+
+The project is organized into a few core areas:
 
 ```text
-codexedoc/
-├── .next/
-├── app/
-│   ├── app/
-│   ├── auth/
-│   │   └── page.tsx
-│   │
-│   ├── create/
-│   │   └── page.tsx
-│   │ 
-│   ├── favicon.ico
-│   ├── globals.css
-│   ├── layout.css
-│   └── page.tsx
-│
-├── components/
-├── lib/
-│   ├── getCurrentUser.ts
-│   └── setAuthCookie.ts
-│ 
-├── node_modules/
-├── public/
-├── app/
-│   ├── actions/
-│   │   └── auth/
-│   │
-│   ├── db/
-│   │   ├── drizzle/
-│   │   ├── db.ts
-│   │   └── schema.ts
-│   │
-│   ├── mutations/
-│   └── queries/
-│
-├── .env
-├── .gitignore
-├── AGENTS.md
-├── CLAUDE.md
-├── drizzle.config.ts
-├── eslint.config.mjs
-├── next-env.d.ts
-├── next.config.ts
-├── package-lock.json
-├── package.json
-├── postcss.config.mjs
-├── proxy.ts
-├── README.md
-├── tsconfig.json
-└── tsconfig.tsbuildinfo
+app/
+  Route handlers, pages, layouts, and styling
+
+components/
+  Reusable UI components
+
+server/
+  Server actions, database connection, schema, migrations, mutations, and queries
+
+lib/
+  Shared utilities and helper functions
+
+public/
+  Static assets
 ```
+
+Supporting configuration files such as `package.json`, `tsconfig.json`, `drizzle.config.ts`, and `next.config.ts` live in the project root.
 
 ---
 
 # Database
 
-If modifying the database schema, follow these steps carefully.
+CODEXEDOC uses **Drizzle ORM** with **Neon** for data storage.
 
-> ⚠️ Obtain the development database URL from the Project Admin first.
+Database schemas are defined in:
 
-## Step 1 — Generate Baseline
-
-If the `drizzle/` folder doesn't exist or is empty:
-
-```bash
-npm run db:generate
-```
-
-This creates the baseline snapshot.
-
----
-
-## Step 2 — Modify Schema
-
-Edit:
-
-```
+```text
 db/schema.ts
 ```
 
-Allowed:
-
-- Add tables
-- Add columns
-- Add relationships
-
-Before deleting anything, contact the Project Admin.
+Whenever schema changes are made, generate and apply new migrations before deploying.
 
 ---
 
-## Step 3 — Generate Migration
+# Community
 
-```bash
-npm run db:generate
-```
+The CODEXEDOC community communicates primarily through Discord.
 
-Review the generated SQL before continuing.
+Join us to:
 
----
+- Ask development questions
+- Discuss new features
+- Coordinate contributions
+- Share ideas
 
-## Step 4 — Apply Migration
-
-Ensure `.env` points to the development database.
-
-```bash
-npm run db:migrate
-```
-
-If migration conflicts occur, consult the Drizzle documentation or request a temporary development database.
+GitHub Issues should be used for bug reports and feature requests.
 
 ---
 
-# Application Versioning
+## Documentation
 
-CODEXEDOC follows **Semantic Versioning**.
-
-```
-MAJOR.MINOR.PATCH
-```
-
-## Meaning
-
-| Version | Purpose |
-|---------|----------|
-| MAJOR | Breaking changes |
-| MINOR | New features |
-| PATCH | Bug fixes |
-
----
-
-## Lifecycle
-
-### Development
-
-- Feature branches
-- Incomplete work allowed
-- Frequently pull from `main`
-
-### Staging
-
-- Auto-deployed to Vercel
-- QA
-- Migration validation
-- UI review
-
-### Production
-
-Released only after:
-
-- PR approval
-- Successful staging verification
-- Migration review
-
----
-
-## Release Tags
-
-```bash
-git tag v1.4.2
-git push origin v1.4.2
-```
-
----
-
-## Contributor Responsibilities
-
-- Increment **MINOR** for features
-- Increment **PATCH** for bug fixes
-- Discuss **MAJOR** versions with Project Admin
-- Never create release tags
-- Document version changes in PRs
-
-### Examples
-
-| Change | Version |
-|---------|----------|
-| New Feature | 1.2.0 → 1.3.0 |
-| Bug Fix | 1.3.0 → 1.3.1 |
-| Breaking Change | 1.3.1 → 2.0.0 |
+- CONTRIBUTING.md
+- CODE_OF_CONDUCT.md
+- SECURITY.md
 
 ---
 
@@ -477,21 +238,10 @@ git push origin v1.4.2
 
 ---
 
-# Task Management
+# Acknowledgements
 
-As you complete work or platform features:
+CODEXEDOC exists thanks to every developer, designer, writer, educator, and learner who contributes to the project.
 
-- Close GitHub issues assigned to you when complete
-- Use GitHub Projects for task tracking and progress visualization
-- Keep issue comments updated with your progress
+Every issue reported, pull request submitted, and discussion started helps make learning more accessible for everyone.
 
-
----
-
-# Project Admin
-
-**Glenn**
-
-**Reach out using either of the following methods:**
-- **Email**: glenniii.dev@gmail.com
-- **Discord**: glenniii.dev
+Thank you for helping build the future of learning.
