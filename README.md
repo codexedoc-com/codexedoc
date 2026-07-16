@@ -51,15 +51,15 @@ Whether you're learning a language, studying for an exam, becoming a software de
 
 ## Features
 
-- 🎯 Learning goals
-- 📚 Knowledge organization
-- 🧠 Active recall
-- 🔁 Spaced repetition
-- 📈 Progress tracking
-- 🔒 Secure authentication
-- 🌐 Cross-device access
+- Learning goals
+- Knowledge organization
+- Active recall
+- Spaced repetition
+- Progress tracking
+- Secure authentication
+- Cross-device access
 
---
+---
 
 # Why CODEXEDOC?
 
