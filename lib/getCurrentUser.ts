@@ -1,11 +1,6 @@
 "use server";
 
-import { eq } from "drizzle-orm";
-import jwt from "jsonwebtoken";
-import { cookies } from "next/headers";
-
-import { db } from "@/server/db/db";
-import { users } from "@/server/db/schema";
+import { getMockUser } from "@/server/mockData";
 
 // Helper: validate UUIDs to avoid passing demo IDs into uuid columns
 export async function isValidUUID(id?: string): Promise<boolean> {
@@ -16,38 +11,5 @@ export async function isValidUUID(id?: string): Promise<boolean> {
 }
 
 export async function getCurrentUser(userId?: string) {
-  if (!userId) {
-    try {
-      const cookieStore = await cookies();
-      const token = cookieStore.get("codexedoc_token")?.value;
-
-      if (token) {
-        const payload = jwt.verify(token, process.env.JWT_SECRET || "dev-secret") as { userId?: string };
-        if (payload?.userId) {
-          userId = payload.userId;
-        }
-      }
-    } catch (e) {
-      console.warn("getCurrentUser: failed to verify token", e);
-    }
-  }
-
-  const normalizedUserId = typeof userId === "string" && (await isValidUUID(userId)) ? userId : undefined;
-
-  if (!normalizedUserId) {
-    return null;
-  }
-
-  try {
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, normalizedUserId))
-      .limit(1);
-
-    return user ?? null;
-  } catch (error) {
-    console.error("Error fetching user:", error);
-    return null;
-  }
+  return getMockUser();
 }

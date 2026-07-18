@@ -30,7 +30,8 @@ export default function AddItemForm({ userId, categories, onClose, onCreated }: 
       if (result?.success) {
         onCreated?.();
       } else {
-        console.error("Failed to create item:", result?.error);
+        const errorMessage = result && "error" in result ? result.error : undefined;
+        console.error("Failed to create item:", errorMessage);
       }
     } catch (e) {
       console.error(e);

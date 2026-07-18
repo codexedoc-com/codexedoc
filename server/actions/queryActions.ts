@@ -1,39 +1,39 @@
 'use server';
 
 import {
-  getActiveGoal,
-  getGoalCategories,
-  getTodayProgress,
-  getProgressAnalytics,
-  getStatistics,
-  getSkillTree,
-  getLearningInsights,
-} from '@/server/queries/appQueries';
+  getMockGoal,
+  getMockCategories,
+  getMockTodayProgress,
+  getMockProgressAnalytics,
+  getMockStatistics,
+  getMockSkillTree,
+  getMockInsights,
+} from '@/server/mockData';
 
 export async function fetchActiveGoal(userId: string) {
-  return getActiveGoal(userId);
+  return getMockGoal();
 }
 
 export async function fetchGoalCategories(goalId: string) {
-  return getGoalCategories(goalId);
+  return getMockCategories(goalId);
 }
 
 export async function fetchTodayProgress(userId: string, goalId?: string) {
-  return getTodayProgress(userId, goalId ?? "");
+  return getMockTodayProgress();
 }
 
 export async function fetchProgressAnalytics(userId: string, goalId?: string) {
-  return getProgressAnalytics(userId, goalId ?? "");
+  return getMockProgressAnalytics();
 }
 
 export async function fetchStatistics(userId: string) {
-  return getStatistics(userId);
+  return getMockStatistics();
 }
 
 export async function fetchSkillTree(userId: string) {
-  return getSkillTree(userId);
+  return getMockSkillTree();
 }
 
 export async function fetchLearningInsights(userId: string) {
-  return getLearningInsights(userId);
+  return getMockInsights();
 }

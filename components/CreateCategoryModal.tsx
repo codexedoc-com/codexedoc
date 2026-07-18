@@ -22,7 +22,8 @@ export default function CreateCategoryModal({ goalId, onClose, onCreated }: Prop
       if (result?.success) {
         onCreated?.();
       } else {
-        console.error("Failed to create category:", result?.error);
+        const errorMessage = result && "error" in result ? result.error : undefined;
+        console.error("Failed to create category:", errorMessage);
       }
     } catch (e) {
       console.error(e);

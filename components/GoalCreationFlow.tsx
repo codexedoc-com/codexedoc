@@ -58,7 +58,8 @@ export function GoalCreationFlow({ onClose, onGoalCreated, userId }: GoalCreatio
         if (result?.success) {
           onGoalCreated?.();
         } else {
-          console.error("Failed to create goal:", result?.error);
+          const errorMessage = result && "error" in result ? result.error : undefined;
+          console.error("Failed to create goal:", errorMessage);
         }
       } catch (error) {
         console.error("Failed to create goal:", error);

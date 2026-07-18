@@ -10,10 +10,8 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 
-import { sendVerificationCode } from "@/server/actions/auth/sendVerificationCode";
-import { verifyCode } from "@/server/actions/auth/verifyCode";
 import { useRouter } from "next/navigation";
-import { Turnstile } from "@marsidev/react-turnstile";
+import { authenticateMockUser } from "@/server/mockData";
 
 export default function AuthPage() {
   const [mode, setMode] = useState<"login" | "register">("register");
@@ -25,12 +23,6 @@ export default function AuthPage() {
 
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
-  const [turnstileToken, setTurnstileToken] = useState("");
-  const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim();
-  const turnstileEnabled = Boolean(turnstileSiteKey);
-  const [turnstileStatus, setTurnstileStatus] = useState<"loading" | "ready" | "error">(
-    turnstileEnabled ? "loading" : "ready"
-  );
 
   useEffect(() => {
     if (authenticated) {
@@ -38,47 +30,26 @@ export default function AuthPage() {
     }
   }, [authenticated, router]);
 
-  useEffect(() => {
-    if (!turnstileEnabled || turnstileStatus !== "loading") {
-      return;
-    }
-
-    const fallbackTimer = window.setTimeout(() => {
-      setTurnstileStatus("ready");
-    }, 5000);
-
-    return () => window.clearTimeout(fallbackTimer);
-  }, [turnstileEnabled, turnstileStatus]);
-
   async function handleSendCode(formData: FormData) {
     setMessage(null);
 
-    if (turnstileEnabled && !turnstileToken && turnstileStatus !== "ready") {
-      setTurnstileStatus("error");
-      setMessage({ type: "error", text: "Please complete the verification challenge before requesting a code." });
-      return;
-    }
-
     startTransition(async () => {
       try {
+        const nextEmail = formData.get("email")?.toString() ?? "";
+        const nextUsername = formData.get("username")?.toString() ?? "";
 
-        if (turnstileToken) {
-          formData.set("cf-turnstile-response", turnstileToken);
-        }
-
-        await sendVerificationCode(formData);
-
-        setEmail(formData.get("email")?.toString() ?? "");
+        setEmail(nextEmail);
         if (mode === "register") {
-          setUsername(formData.get("username")?.toString() ?? "");
+          setUsername(nextUsername);
         }
+
+        authenticateMockUser(nextEmail, nextUsername || undefined);
 
         setStep("code");
         setMessage({
           type: "success",
-          text: "Verification code sent to your email.",
+          text: "Mock verification code sent. Use any 6-digit code to continue.",
         });
-        setTurnstileToken("");
       } catch (error) {
         setMessage({
           type: "error",
@@ -93,25 +64,20 @@ export default function AuthPage() {
 
     startTransition(async () => {
       try {
-        const result = await verifyCode(formData);
-
-        // Success case - use the message from the server
-        if (result?.success) {
-          setMessage({
-            type: "success",
-            text: result.message, // "Account created successfully!" or "Logged in successfully!"
-          });
-
-          // Small delay so user can see the success message
-          setTimeout(() => {
-            setAuthenticated(true);
-          }, 800);
-        } else {
-          setMessage({
-            type: "error",
-            text: "Unexpected response from server",
-          });
+        const code = formData.get("verificationCode")?.toString() ?? "";
+        if (!code || code.length < 4) {
+          throw new Error("Please enter the mock verification code.");
         }
+
+        authenticateMockUser(email, username || undefined);
+        setMessage({
+          type: "success",
+          text: mode === "register" ? "Account created successfully!" : "Logged in successfully!",
+        });
+
+        setTimeout(() => {
+          setAuthenticated(true);
+        }, 800);
       } catch (error) {
         setMessage({
           type: "error",
@@ -119,7 +85,7 @@ export default function AuthPage() {
         });
       }
     });
-}
+  }
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#050816] text-white">
@@ -302,39 +268,8 @@ export default function AuthPage() {
 
                 <input type="hidden" name="mode" value={mode} />
 
-                <div className="flex flex-col items-center justify-center gap-2 py-2">
-                  {turnstileEnabled ? (
-                    <>
-                      <Turnstile
-                        siteKey={turnstileSiteKey!}
-                        onSuccess={(token) => {
-                          setTurnstileToken(token);
-                          setTurnstileStatus("ready");
-                        }}
-                        onExpire={() => {
-                          setTurnstileToken("");
-                          setTurnstileStatus("loading");
-                        }}
-                        onError={() => {
-                          setTurnstileToken("");
-                          setTurnstileStatus("error");
-                        }}
-                        options={{
-                          appearance: "always",
-                          theme: "dark",
-                        }}
-                      />
-                      <p className="text-center text-sm text-white/60">
-                        {turnstileStatus === "loading" && "Waiting for verification challenge..."}
-                        {turnstileStatus === "ready" && (!turnstileToken ? "Verification challenge unavailable, continuing without it." : "Verification challenge complete.")}
-                        {turnstileStatus === "error" && "The verification challenge could not be completed. Please refresh and try again."}
-                      </p>
-                    </>
-                  ) : (
-                    <p className="text-center text-sm text-emerald-300/80">
-                      Verification challenge is not configured right now, so this step will continue without it.
-                    </p>
-                  )}
+                <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-center text-sm text-emerald-200">
+                  This mock experience does not require any email service, turnstile keys, or backend setup.
                 </div>
 
                 <button
