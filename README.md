@@ -7,24 +7,27 @@
 
 **CODEXEDOC** is a Learning Operating System designed to help people learn anything more effectively using proven learning science.
 
+> 🚧 **Project Status:** CODEXEDOC is currently in active development. APIs, features, and architecture may evolve as we work toward the first public release.
+
 ---
 
 # Table of Contents
 
 * [Overview](#overview)
+* [Features](#features)
 * [Why CODEXEDOC?](#why-codexedoc)
 * [Tech Stack](#tech-stack)
 * [License](#license)
+* [Open Source Philosophy](#open-source-philosophy)
+* [Contributing Workflow](#contributing-workflow)
 * [Getting Started](#getting-started)
-  * [1. Prerequisites](#1-prerequisites)
-  * [2. Clone & Setup](#2-clone--setup)
-  * [3. Configure Environment](#3-configure-environment)
-  * [4. Install Dependencies](#4-install-dependencies)
-  * [5. Start Development Server](#5-start-development-server)
+  * [Prerequisites](#prerequisites)
+  * [New Contributors](#new-contributors)
+  * [Core Contributors](#core-contributors)
 * [Project Architecture](#project-architecture)
 * [Database](#database)
 * [Community](#community)
-* [Documentation](#Documentation)
+* [Documentation](#documentation)
 * [Learn More](#learn-more)
 * [Acknowledgements](#acknowledgements)
 
@@ -51,13 +54,16 @@ Whether you're learning a language, studying for an exam, becoming a software de
 
 ## Features
 
-- Learning goals
-- Knowledge organization
-- Active recall
-- Spaced repetition
-- Progress tracking
-- Secure authentication
-- Cross-device access
+- 🎯 Goal Management
+- 🧠 Learning Blueprints
+- 📝 Knowledge Items
+- 🔁 Active Recall Engine
+- 📅 Spaced Repetition
+- ⏱️ Guided Learning Sessions
+- 📖 Reflection Journal
+- 🌳 Skill Trees
+- 📊 Learning Analytics
+- 🏆 Mastery Tracking
 
 ---
 
@@ -108,9 +114,37 @@ We believe knowledge should grow through collaboration while ensuring improvemen
 
 ---
 
+# Contributing Workflow
+
+To help new contributors get familiar with the project while keeping development secure, CODEXEDOC uses a contributor progression.
+
+### Mock Contributor
+
+All new contributors begin as **Mock Contributors**.
+
+At this stage you'll:
+
+- Clone the `mock` branch
+- Work on issues using a development environment that mirrors the production codebase without exposing sensitive credentials.
+- Learn the project structure and contribution workflow
+
+### Core Contributor
+
+After consistently demonstrating quality contributions, you'll be promoted to **Core Contributor**.
+
+Core Contributors:
+
+- Clone from the `main` branch
+- Receive the project's development environment keys
+- Contribute directly to the production codebase
+
+This workflow helps protect sensitive infrastructure while giving contributors a clear path to earning additional responsibility.
+
+---
+
 # Getting Started
 
-## 1. Prerequisites
+## Prerequisites
 
 Install:
 
@@ -119,51 +153,41 @@ Install:
 
 ---
 
-## 2. Clone & Setup
+## New Contributors
 
-Clone the repository:
+If you're joining the project for the first time, you'll begin on the `mock` branch.
 
 ```bash
 git clone https://github.com/codexedoc-com/codexedoc.git
 cd codexedoc
-```
+git checkout mock
 
----
-
-## 3. Configure Environment
-
-Create a `.env` file using `.env.example`.
-
-```env
-DATABASE_URL=
-RESEND_API_KEY=
-NEXT_PUBLIC_TURNSTILE_SITE_KEY=
-TURNSTILE_SECRET_KEY=
-JWT_SECRET=
-```
-
-> Never commit your `.env` file or share production credentials.
-
----
-
-## 4. Install Dependencies
-
-```bash
 npm install
-```
 
----
-
-## 5. Start Development Server
-
-```bash
 npm run dev
 ```
 
-Open:
+No environment keys are required.
 
-```text
-http://localhost:3000
+Once you're promoted to Core Contributor, you'll receive the development environment configuration and begin working from `main`.
+
+---
+
+## Core Contributors
+
+Core Contributors should clone the `main` branch.
+
+```bash
+git clone https://github.com/codexedoc-com/codexedoc.git
+cd codexedoc
+git checkout main
+```
+
+Create a `.env` file using the environment configuration provided by the maintainers.
+
+```bash
+npm install
+npm run dev
 ```
 
 ---
@@ -218,15 +242,15 @@ Join us to:
 - Coordinate contributions
 - Share ideas
 
-GitHub Issues should be used for bug reports and feature requests.
+GitHub Issues should be used for bug reports and feature requests. Before beginning work on an issue, post it in `#task-board` so the team knows you're working on it and duplicate effort is avoided.
 
 ---
 
 ## Documentation
 
-- CONTRIBUTING.md
-- CODE_OF_CONDUCT.md
-- SECURITY.md
+- **CONTRIBUTING.md** — Contribution guidelines and development workflow.
+- **CODE_OF_CONDUCT.md** — Community expectations and standards.
+- **SECURITY.md** — How to responsibly report security vulnerabilities.
 
 ---
 
