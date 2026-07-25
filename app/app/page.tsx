@@ -30,9 +30,13 @@ import { CategoriesSection } from "@/components/CategoriesSection";
 import { ProgressAnalytics } from "@/components/ProgressAnalytics";
 import { SkillTree } from "@/components/SkillTree";
 import AddItemForm from "@/components/AddItemForm";
+import CreateCategoryModal from "@/components/CreateCategoryModal";
+
 
 import { StatsOverview } from "@/components/StatsOverview";
 import { LearningInsights } from "@/components/LearningInsights";
+import ItemDetailModal from "@/components/ItemDetailModal";
+import { updateItemAction, deleteItemAction } from "@/server/mutations/appMutations";
 
 import { getCurrentUser } from "@/lib/getCurrentUser";
 import {
@@ -43,6 +47,7 @@ import {
   fetchStatistics,
   fetchSkillTree,
   fetchLearningInsights,
+  fetchUserItems,
 } from "@/server/actions/queryActions";
 
 interface TodayProgressStats {
@@ -94,6 +99,7 @@ interface DashboardData {
   user: { id?: string } | null;
   goal: { id?: string; title?: string } | null;
   categories: Array<{ id: string; name: string; itemCount: number }>;
+  items: any[];
   todayStats: TodayProgressStats;
   progressStats: ProgressAnalyticsStats;
   statistics: StatisticsStats;
@@ -140,10 +146,13 @@ export default function DashboardPage() {
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showAddItemModal, setShowAddItemModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [showCreateCategoryModal, setShowCreateCategoryModal] = useState(false);
   const [data, setData] = useState<DashboardData>({
     user: null,
     goal: null,
     categories: [],
+    items: [],
     todayStats: defaultTodayStats,
     progressStats: defaultProgressStats,
     statistics: defaultStatistics,
@@ -166,9 +175,10 @@ export default function DashboardPage() {
         let skillTree: DashboardData["skillTree"] = defaultSkillTree;
         let insights: DashboardData["insights"] = defaultInsights;
         let categories: DashboardData["categories"] = [];
+        let items: any[] = [];
 
         if (userId) {
-          [goal, todayStats, progressStats, statistics, skillTree, insights] =
+          [goal, todayStats, progressStats, statistics, skillTree, insights, items] =
             await Promise.all([
               fetchActiveGoal(userId),
               fetchTodayProgress(userId, ""),
@@ -176,6 +186,7 @@ export default function DashboardPage() {
               fetchStatistics(userId),
               fetchSkillTree(userId),
               fetchLearningInsights(userId),
+              fetchUserItems(userId),
             ]);
 
           if (goal?.id) {
@@ -187,6 +198,7 @@ export default function DashboardPage() {
           user,
           goal,
           categories,
+          items,
           todayStats,
           progressStats,
           statistics,
@@ -318,8 +330,21 @@ export default function DashboardPage() {
               <SessionBreakdown />
               <CategoriesSection
                 categories={data.categories}
-                onCreateCategory={() => console.log("Create category")}
+                items={data.items}
+                onCreateCategory={() => setShowCreateCategoryModal(true)}
+                onSelectItem={(item) => setSelectedItem(item)}
               />
+              {showCreateCategoryModal && (
+                <CreateCategoryModal
+                  goalId={data.goal?.id || ""}
+                  onClose={() => setShowCreateCategoryModal(false)}
+                  onCreated={() => {
+                    setShowCreateCategoryModal(false);
+                    router.refresh();
+                    window.location.reload();
+                  }}
+                />
+              )}
               <SkillTree />
             </div>
 
@@ -368,6 +393,24 @@ export default function DashboardPage() {
                   New Goal
                 </button>
               </motion.div>
+
+              {selectedItem && (
+                <ItemDetailModal
+                  item={selectedItem}
+                  onClose={() => setSelectedItem(null)}
+                  onUpdate={async (updatedData) => {
+                    await updateItemAction(updatedData.id, updatedData);
+                    setSelectedItem(null);
+                    router.refresh();
+                  }}
+                  onDelete={async (itemId) => {
+                    await deleteItemAction(itemId);
+                    setSelectedItem(null);
+                    router.refresh();
+                  }}
+                />
+              )}
+
             </div>
           </div>
         </div>

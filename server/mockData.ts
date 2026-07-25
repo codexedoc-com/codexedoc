@@ -23,6 +23,8 @@ type MockItem = {
   prompt: string;
   answer: string;
   difficulty: number;
+  notes?: string;
+  tags?: string[];
   masteryLevel: string;
   createdAt: string;
 };
@@ -104,6 +106,8 @@ function createInitialState(): MockState {
         prompt: "How do you say hello in Mandarin?",
         answer: "Nǐ hǎo",
         difficulty: 1,
+        notes: "",
+        tags: [],
         masteryLevel: "mastered",
         createdAt: "2026-06-15T09:10:00.000Z",
       },
@@ -114,6 +118,8 @@ function createInitialState(): MockState {
         type: "phrase",
         prompt: "How do you say thank you?",
         answer: "Xièxie",
+        notes: "",
+        tags: [],
         difficulty: 2,
         masteryLevel: "learning",
         createdAt: "2026-06-16T09:10:00.000Z",
@@ -126,6 +132,8 @@ function createInitialState(): MockState {
         prompt: "What is the Mandarin word for date?",
         answer: "Rìqī",
         difficulty: 2,
+        notes: "",
+        tags: [],
         masteryLevel: "new",
         createdAt: "2026-06-17T09:10:00.000Z",
       },
@@ -167,6 +175,35 @@ function createInitialState(): MockState {
       },
     ],
   };
+}
+
+export function updateMockItem(
+  itemId: string,
+  data: { prompt?: string; answer?: string; type?: string; difficulty?: number, notes?: string; tags?: string[] }
+) {
+  const item = mockState.items.find((i) => i.id === itemId);
+  if (!item) return {
+    success: false,
+    error: "Item not found",
+  };
+
+  if (data.prompt !== undefined) item.prompt = data.prompt;
+  if (data.answer !== undefined) item.answer = data.answer;
+  if (data.type !== undefined) item.type = data.type;
+  if (data.difficulty !== undefined) item.difficulty = data.difficulty;
+  if (data.notes !== undefined) item.notes = data.notes;
+  {/* if (data.tags !== undefined) item.tags = data.tags */ }
+  return { success: true, item };
+}
+
+export function deleteMockItem(itemId: string) {
+  mockState.items = mockState.items.filter((i) => i.id !== itemId);
+  mockState.reviews = mockState.reviews.filter((r) => r.itemId !== itemId);
+  return { success: true };
+}
+
+export function getMockItems(userId: string) {
+  return mockState.items.filter((i) => i.userId === userId || i.userId === "mock-user")
 }
 
 let mockState = createInitialState();
@@ -304,6 +341,7 @@ export function createMockItem(userId: string, data: { areaId: string; type: str
     prompt: data.prompt,
     answer: data.answer,
     difficulty: data.difficulty ?? 1,
+    notes: "",
     masteryLevel: "new",
     createdAt: new Date().toISOString(),
   };

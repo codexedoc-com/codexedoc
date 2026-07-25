@@ -4,7 +4,31 @@ import {
   createMockGoal,
   createMockItem,
   createMockCategory,
+  updateMockItem,
+  deleteMockItem,
 } from "@/server/mockData";
+
+// Actualizar una tarjeta de conocimiento
+export async function updateItemAction(
+  itemId: string,
+  data: { prompt?: string; answer?: string; type?: string; difficulty?: number; notes?: string; tags?: string[] }
+) {
+  try {
+    return updateMockItem(itemId, data);
+  } catch (error) {
+    console.error("Error al actualizar item:", error);
+    return { success: false, error: "Failed to update item" };
+  }
+}
+// Eliminar una tarjeta de conocimiento
+export async function deleteItemAction(itemId: string) {
+  try {
+    return deleteMockItem(itemId);
+  } catch (error) {
+    console.error("Error al eliminar item:", error);
+    return { success: false, error: "Failed to delete item" };
+  }
+}
 
 // Create a goal with server action
 export async function createGoalAction(

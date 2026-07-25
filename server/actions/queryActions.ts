@@ -1,5 +1,7 @@
 'use server';
 
+import { getMockItems } from "@/server/mockData"
+
 import {
   getMockGoal,
   getMockCategories,
@@ -36,4 +38,8 @@ export async function fetchSkillTree(userId: string) {
 
 export async function fetchLearningInsights(userId: string) {
   return getMockInsights();
+}
+
+export async function fetchUserItems(userId: string) {
+  return getMockItems(userId);
 }

@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Target } from "lucide-react";
+import Link from "next/link";
 
 export function SessionBreakdown() {
   const segments = [
@@ -63,9 +64,12 @@ export function SessionBreakdown() {
       </div>
 
       {/* CTA */}
-      <button className="w-full rounded-2xl bg-gradient-to-r from-indigo-500 to-cyan-500 py-4 font-semibold text-white transition hover:shadow-lg hover:shadow-indigo-500/50">
+      <Link
+        href="/app/session"
+        className="block w-full text-center rounded-2xl bg-gradient-to-r from-indigo-500 to-cyan-500 py-4 font-semibold text-white transition hover:shadow-lg hover:shadow-indigo-500/50"
+      >
         Start Session
-      </button>
+      </Link>
     </motion.div>
   );
 }
