@@ -1,6 +1,6 @@
 "use server";
 
-import { getMockUser } from "@/server/mockData";
+import { serverAuth } from "@/lib/auth/gateway/serverAuth";
 
 // Helper: validate UUIDs to avoid passing demo IDs into uuid columns
 export async function isValidUUID(id?: string): Promise<boolean> {
@@ -11,5 +11,5 @@ export async function isValidUUID(id?: string): Promise<boolean> {
 }
 
 export async function getCurrentUser(userId?: string) {
-  return getMockUser();
+  return serverAuth.getUser();
 }

@@ -99,249 +99,246 @@ export default function AuthPage() {
       <div className="relative z-10 flex min-h-screen items-center justify-center px-6 py-20">
 
         {/* MAIN AUTH CARD */}
-      <div className="relative grid w-full max-w-6xl overflow-hidden rounded-[40px] border border-white/10 bg-white/5 backdrop-blur-2xl shadow-[0_0_80px_rgba(99,102,241,0.15)] lg:grid-cols-2">
+        <div className="relative grid w-full max-w-6xl overflow-hidden rounded-[40px] border border-white/10 bg-white/5 backdrop-blur-2xl shadow-[0_0_80px_rgba(99,102,241,0.15)] lg:grid-cols-2">
 
-        {/* LEFT PANEL (Context / Branding) */}
-        <div className="relative hidden lg:flex flex-col justify-between items-center p-14 border-r border-white/10">
+          {/* LEFT PANEL (Context / Branding) */}
+          <div className="relative hidden lg:flex flex-col justify-between items-center p-14 border-r border-white/10">
 
-          {/* background glow */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(99,102,241,0.25),transparent_60%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(34,211,238,0.15),transparent_60%)]" />
+            {/* background glow */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(99,102,241,0.25),transparent_60%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(34,211,238,0.15),transparent_60%)]" />
 
-          <div className="relative z-10 py-20">
+            <div className="relative z-10 py-20">
 
-            <div className="mb-5 flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-500/10 border border-indigo-500/20">
-                <Image src="/codexedoc.png" alt="Logo" className="h-8 w-8" width={24} height={24} />
+              <div className="mb-5 flex items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-500/10 border border-indigo-500/20">
+                  <Image src="/codexedoc.png" alt="Logo" className="h-8 w-8" width={24} height={24} />
+                </div>
+                <h1 className="text-2xl font-black">CODEXEDOC</h1>
               </div>
-              <h1 className="text-2xl font-black">CODEXEDOC</h1>
+
+              <h1 className="mt-8 text-6xl font-black leading-tight">
+                {mode === "login" ? (
+                  <>
+                    Welcome<br />
+                    <span className="bg-linear-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+                      Back.
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    Create<br />
+                    <span className="bg-linear-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+                      Account.
+                    </span>
+                  </>
+                )}
+              </h1>
+
+              <p className="mt-6 text-lg text-white/60 max-w-md leading-relaxed">
+                {mode === "login"
+                  ? "Jump back into your learning journey. Continue where you left off and keep building mastery."
+                  : "Start your learning system. Build structured knowledge, track progress, and turn goals into mastery."}
+              </p>
+
             </div>
-
-            <h1 className="mt-8 text-6xl font-black leading-tight">
-              {mode === "login" ? (
-                <>
-                  Welcome<br />
-                  <span className="bg-linear-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
-                    Back.
-                  </span>
-                </>
-              ) : (
-                <>
-                  Create<br />
-                  <span className="bg-linear-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
-                    Account.
-                  </span>
-                </>
-              )}
-            </h1>
-
-            <p className="mt-6 text-lg text-white/60 max-w-md leading-relaxed">
-              {mode === "login"
-                ? "Jump back into your learning journey. Continue where you left off and keep building mastery."
-                : "Start your learning system. Build structured knowledge, track progress, and turn goals into mastery."}
-            </p>
 
           </div>
 
-        </div>
+          {/* RIGHT PANEL (FORM) */}
+          <div className="flex items-center justify-center p-10 sm:p-14">
 
-        {/* RIGHT PANEL (FORM) */}
-        <div className="flex items-center justify-center p-10 sm:p-14">
+            <div className="w-full max-w-md">
 
-          <div className="w-full max-w-md">
-
-            {/* MOBILE HEADER */}
-            <div className="mb-10 flex items-center gap-3 lg:hidden">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-500/10 border border-indigo-500/20">
-                <Image src="/codexedoc.png" alt="Logo" className="h-8 w-8" width={24} height={24} />
+              {/* MOBILE HEADER */}
+              <div className="mb-10 flex items-center gap-3 lg:hidden">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-500/10 border border-indigo-500/20">
+                  <Image src="/codexedoc.png" alt="Logo" className="h-8 w-8" width={24} height={24} />
+                </div>
+                <h1 className="text-xl font-black">CODEXEDOC</h1>
               </div>
-              <h1 className="text-xl font-black">CODEXEDOC</h1>
-            </div>
 
-            {/* TITLE */}
-            <div className="mb-8 lg:hidden">
-              <h2 className="text-4xl font-black tracking-tight">
-                {step === "email"
-                  ? mode === "register"
-                    ? "Create Account"
-                    : "Sign In"
-                  : "Verify Access"}
-              </h2>
+              {/* TITLE */}
+              <div className="mb-8 lg:hidden">
+                <h2 className="text-4xl font-black tracking-tight">
+                  {step === "email"
+                    ? mode === "register"
+                      ? "Create Account"
+                      : "Sign In"
+                    : "Verify Access"}
+                </h2>
 
-              <p className="mt-3 text-white/60">
-                {step === "email"
-                  ? mode === "login"
-                    ? "Continue your learning journey"
-                    : "Start building your learning system"
-                  : "Enter the 6-digit code sent to your email"}
-              </p>
-            </div>
+                <p className="mt-3 text-white/60">
+                  {step === "email"
+                    ? mode === "login"
+                      ? "Continue your learning journey"
+                      : "Start building your learning system"
+                    : "Enter the 6-digit code sent to your email"}
+                </p>
+              </div>
 
-            {/* MODE TOGGLE */}
-            {step === "email" && (
-              <div className="mb-8 flex rounded-2xl border border-white/10 bg-white/5 p-1">
-                <button
-                  type="button"
-                  onClick={() => setMode("login")}
-                  className={`flex-1 rounded-xl py-3 text-sm font-semibold transition ${
-                    mode === "login"
+              {/* MODE TOGGLE */}
+              {step === "email" && (
+                <div className="mb-8 flex rounded-2xl border border-white/10 bg-white/5 p-1">
+                  <button
+                    type="button"
+                    onClick={() => setMode("login")}
+                    className={`flex-1 rounded-xl py-3 text-sm font-semibold transition ${mode === "login"
                       ? "bg-indigo-500 text-white"
                       : "text-white/60 hover:text-white"
-                  }`}
-                >
-                  Login
-                </button>
+                      }`}
+                  >
+                    Login
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() => setMode("register")}
-                  className={`flex-1 rounded-xl py-3 text-sm font-semibold transition ${
-                    mode === "register"
+                  <button
+                    type="button"
+                    onClick={() => setMode("register")}
+                    className={`flex-1 rounded-xl py-3 text-sm font-semibold transition ${mode === "register"
                       ? "bg-indigo-500 text-white"
                       : "text-white/60 hover:text-white"
-                  }`}
-                >
-                  Register
-                </button>
-              </div>
-            )}
+                      }`}
+                  >
+                    Register
+                  </button>
+                </div>
+              )}
 
 
 
-            {/* EMAIL STEP */}
-            {step === "email" ? (
-              <form key="emailForm" action={handleSendCode} autoComplete="off" className="space-y-5">
+              {/* EMAIL STEP */}
+              {step === "email" ? (
+                <form key="emailForm" action={handleSendCode} autoComplete="off" className="space-y-5">
 
-                <input
-                  type="text"
-                  name="contact_field"
-                  defaultValue=""
-                  autoComplete="off"
-                  tabIndex={-1}
-                  aria-hidden="true"
-                  style={{
-                    position: "absolute",
-                    left: "-9999px",
-                  }}
-                />
+                  <input
+                    type="text"
+                    name="contact_field"
+                    defaultValue=""
+                    autoComplete="off"
+                    tabIndex={-1}
+                    aria-hidden="true"
+                    style={{
+                      position: "absolute",
+                      left: "-9999px",
+                    }}
+                  />
 
-                {mode === "register" && (
+                  {mode === "register" && (
+                    <div>
+                      <label className="mb-2 block text-sm text-white/50">
+                        Username
+                      </label>
+
+                      <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-xl focus-within:border-indigo-500/30 transition">
+                        <User className="h-5 w-5 text-indigo-300/60" />
+                        <input
+                          name="username"
+                          autoComplete="username"
+                          value={username}
+                          onChange={(e) => setUsername(e.target.value)}
+                          placeholder="your name"
+                          className="w-full bg-transparent outline-none text-white/90"
+                          required
+                        />
+                      </div>
+                    </div>
+                  )}
+
                   <div>
                     <label className="mb-2 block text-sm text-white/50">
-                      Username
+                      Email
                     </label>
 
                     <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-xl focus-within:border-indigo-500/30 transition">
-                      <User className="h-5 w-5 text-indigo-300/60" />
+                      <Mail className="h-5 w-5 text-indigo-300/60" />
                       <input
-                        name="username"
-                        autoComplete="username"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        placeholder="your name"
+                        type="email"
+                        name="email"
+                        autoComplete="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="you@example.com"
                         className="w-full bg-transparent outline-none text-white/90"
                         required
                       />
                     </div>
                   </div>
-                )}
 
-                <div>
-                  <label className="mb-2 block text-sm text-white/50">
-                    Email
-                  </label>
+                  <input type="hidden" name="mode" value={mode} />
 
-                  <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-xl focus-within:border-indigo-500/30 transition">
-                    <Mail className="h-5 w-5 text-indigo-300/60" />
-                    <input
-                      type="email"
-                      name="email"
-                      autoComplete="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="you@example.com"
-                      className="w-full bg-transparent outline-none text-white/90"
-                      required
-                    />
+                  <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-center text-sm text-emerald-200">
+                    This mock experience does not require any email service, turnstile keys, or backend setup.
                   </div>
-                </div>
 
-                <input type="hidden" name="mode" value={mode} />
+                  <button
+                    disabled={pending || !email.trim() || (mode === "register" && !username.trim())}
+                    className="group w-full rounded-2xl bg-indigo-500 py-4 font-semibold transition hover:bg-indigo-400 disabled:opacity-50"
+                  >
+                    {pending ? "Sending..." : "Send Verification Code"}
+                    <ArrowRight className="ml-2 inline-block h-4 w-4 transition group-hover:translate-x-1" />
+                  </button>
+                </form>
+              ) : (
+                /* CODE STEP */
+                <form key="codeForm" action={handleVerifyCode} autoComplete="off" className="space-y-5">
 
-                <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-center text-sm text-emerald-200">
-                  This mock experience does not require any email service, turnstile keys, or backend setup.
-                </div>
+                  <input type="hidden" name="email" value={email} />
+                  {mode === "register" && (
+                    <input type="hidden" name="username" value={username} />
+                  )}
 
-                <button
-                  disabled={pending || !email.trim() || (mode === "register" && !username.trim())}
-                  className="group w-full rounded-2xl bg-indigo-500 py-4 font-semibold transition hover:bg-indigo-400 disabled:opacity-50"
-                >
-                  {pending ? "Sending..." : "Send Verification Code"}
-                  <ArrowRight className="ml-2 inline-block h-4 w-4 transition group-hover:translate-x-1" />
-                </button>
-              </form>
-            ) : (
-              /* CODE STEP */
-              <form key="codeForm" action={handleVerifyCode} autoComplete="off" className="space-y-5">
+                  <div>
+                    <label className="mb-2 block text-sm text-white/50">
+                      Verification Code
+                    </label>
 
-                <input type="hidden" name="email" value={email} />
-                {mode === "register" && (
-                  <input type="hidden" name="username" value={username} />
-                )}
-
-                <div>
-                  <label className="mb-2 block text-sm text-white/50">
-                    Verification Code
-                  </label>
-
-                  <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-xl focus-within:border-indigo-500/30 transition">
-                    <Lock className="h-5 w-5 text-indigo-300/60" />
-                    <input
-                      type="text"
-                      name="verificationCode"
-                      autoComplete="one-time-code"
-                      inputMode="numeric"
-                      pattern="[0-9]*"
-                      maxLength={6}
-                      placeholder="123456"
-                      className="w-full bg-transparent text-2xl tracking-widest outline-none text-white/90"
-                      required
-                    />
+                    <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-xl focus-within:border-indigo-500/30 transition">
+                      <Lock className="h-5 w-5 text-indigo-300/60" />
+                      <input
+                        type="text"
+                        name="verificationCode"
+                        autoComplete="one-time-code"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        maxLength={6}
+                        placeholder="123456"
+                        className="w-full bg-transparent text-2xl tracking-widest outline-none text-white/90"
+                        required
+                      />
+                    </div>
                   </div>
-                </div>
 
-                <button
-                  disabled={pending}
-                  className="w-full rounded-2xl bg-indigo-500 py-4 font-semibold transition hover:bg-indigo-400 disabled:opacity-50"
-                >
-                  {pending ? "Verifying..." : "Verify & Continue"}
-                </button>
+                  <button
+                    disabled={pending}
+                    className="w-full rounded-2xl bg-indigo-500 py-4 font-semibold transition hover:bg-indigo-400 disabled:opacity-50"
+                  >
+                    {pending ? "Verifying..." : "Verify & Continue"}
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() => setStep("email")}
-                  className="flex w-full items-center justify-center gap-2 text-white/50 hover:text-white transition"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  Back
-                </button>
-              </form>
-            )}
+                  <button
+                    type="button"
+                    onClick={() => setStep("email")}
+                    className="flex w-full items-center justify-center gap-2 text-white/50 hover:text-white transition"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                    Back
+                  </button>
+                </form>
+              )}
 
-            {/* MESSAGE (SYSTEM STYLE) */}
-            {message && (
-              <div
-                className={`mt-8 rounded-2xl border p-4 text-sm backdrop-blur-xl ${
-                  message.type === "success"
+              {/* MESSAGE (SYSTEM STYLE) */}
+              {message && (
+                <div
+                  className={`mt-8 rounded-2xl border p-4 text-sm backdrop-blur-xl ${message.type === "success"
                     ? "border-green-500/20 bg-green-500/10 text-green-200"
                     : "border-red-500/20 bg-red-500/10 text-red-200"
-                }`}
-              >
-                {message.text}
-              </div>
-            )}
+                    }`}
+                >
+                  {message.text}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
         </div>
       </div>
     </main>

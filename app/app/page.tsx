@@ -180,13 +180,13 @@ export default function DashboardPage() {
         if (userId) {
           [goal, todayStats, progressStats, statistics, skillTree, insights, items] =
             await Promise.all([
-              fetchActiveGoal(userId),
-              fetchTodayProgress(userId, ""),
-              fetchProgressAnalytics(userId, ""),
-              fetchStatistics(userId),
-              fetchSkillTree(userId),
-              fetchLearningInsights(userId),
-              fetchUserItems(userId),
+              fetchActiveGoal(),
+              fetchTodayProgress(""),
+              fetchProgressAnalytics(""),
+              fetchStatistics(),
+              fetchSkillTree(),
+              fetchLearningInsights(),
+              fetchUserItems(),
             ]);
 
           if (goal?.id) {
