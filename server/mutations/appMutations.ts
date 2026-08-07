@@ -7,6 +7,7 @@ import {
   updateMockItem,
   deleteMockItem,
 } from "@/server/mockData";
+import { serverAuth } from "@/lib/auth/gateway/serverAuth";
 
 // Actualizar una tarjeta de conocimiento
 export async function updateItemAction(
@@ -14,15 +15,18 @@ export async function updateItemAction(
   data: { prompt?: string; answer?: string; type?: string; difficulty?: number; notes?: string; tags?: string[] }
 ) {
   try {
+    const user = await serverAuth.requireUser();
     return updateMockItem(itemId, data);
   } catch (error) {
     console.error("Error al actualizar item:", error);
     return { success: false, error: "Failed to update item" };
   }
 }
+
 // Eliminar una tarjeta de conocimiento
 export async function deleteItemAction(itemId: string) {
   try {
+    const user = await serverAuth.requireUser();
     return deleteMockItem(itemId);
   } catch (error) {
     console.error("Error al eliminar item:", error);
@@ -32,7 +36,6 @@ export async function deleteItemAction(itemId: string) {
 
 // Create a goal with server action
 export async function createGoalAction(
-  userId: string,
   data: {
     title: string;
     dailyMinutes: number;
@@ -40,7 +43,9 @@ export async function createGoalAction(
   }
 ) {
   try {
-    return createMockGoal(userId, {
+    const user = await serverAuth.requireUser();
+
+    return createMockGoal(user.id, {
       title: data.title,
       dailyMinutes: data.dailyMinutes,
       deadline: data.deadline?.toISOString(),
@@ -53,7 +58,6 @@ export async function createGoalAction(
 
 // Create a knowledge item (client calls this as a server action)
 export async function createItemAction(
-  userId: string,
   data: {
     areaId: string;
     type: string;
@@ -63,11 +67,13 @@ export async function createItemAction(
   }
 ) {
   try {
+    const user = await serverAuth.requireUser();
+
     if (!data.areaId) {
       return { success: false, error: "Missing areaId" };
     }
 
-    return createMockItem(userId, data);
+    return createMockItem(user.id, data);
   } catch (error) {
     console.error("Error creating item:", error);
     return { success: false, error: "Failed to create item" };
@@ -77,6 +83,7 @@ export async function createItemAction(
 // Create a learning area with server action
 export async function createLearningAreaAction(goalId: string, name: string) {
   try {
+    const user = await serverAuth.requireUser();
     return createMockCategory(goalId, name);
   } catch (error) {
     console.error("Error creating category:", error);

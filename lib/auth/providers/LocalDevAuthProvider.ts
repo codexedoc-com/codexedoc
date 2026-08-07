@@ -2,6 +2,7 @@ import type { IAuthProvider } from "../contracts/IAuthProvider";
 import type { AuthUser, AuthSession } from "../types";
 import { getMockUser } from "@/server/mockData";
 
+
 /**
  * LocalDevAuthProvider — Community Mode authentication provider.
  *

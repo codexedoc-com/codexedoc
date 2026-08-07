@@ -372,7 +372,6 @@ export default function DashboardPage() {
 
                 {showAddItemModal && (
                   <AddItemForm
-                    userId={data.user?.id}
                     categories={data.categories}
                     onClose={() => setShowAddItemModal(false)}
                     onCreated={() => {

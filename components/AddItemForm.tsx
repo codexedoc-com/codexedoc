@@ -9,13 +9,12 @@ interface Category {
 }
 
 interface Props {
-  userId?: string | null;
   categories: Category[];
   onClose?: () => void;
   onCreated?: () => void;
 }
 
-export default function AddItemForm({ userId, categories, onClose, onCreated }: Props) {
+export default function AddItemForm({ categories, onClose, onCreated }: Props) {
   const [areaId, setAreaId] = useState(categories?.[0]?.id || "");
   const [type, setType] = useState("vocab");
   const [prompt, setPrompt] = useState("");
@@ -23,10 +22,10 @@ export default function AddItemForm({ userId, categories, onClose, onCreated }: 
   const [pending, setPending] = useState(false);
 
   const handleCreate = async () => {
-    if (!userId || !areaId || !prompt || !answer) return;
+    if (!areaId || !prompt || !answer) return;
     setPending(true);
     try {
-      const result = await createItemAction(userId, { areaId, type, prompt, answer });
+      const result = await createItemAction({ areaId, type, prompt, answer });
       if (result?.success) {
         onCreated?.();
       } else {
@@ -75,7 +74,7 @@ export default function AddItemForm({ userId, categories, onClose, onCreated }: 
 
         <div className="mt-4 sm:mt-6 flex justify-end gap-2 sm:gap-3">
           <button onClick={onClose} className="rounded-2xl bg-white/5 px-3 sm:px-4 py-2 text-sm sm:text-base font-semibold hover:bg-white/10 transition">Cancel</button>
-          <button onClick={handleCreate} disabled={!userId || !areaId || !prompt || !answer || pending} className="rounded-2xl bg-indigo-500 px-3 sm:px-4 py-2 text-sm sm:text-base font-semibold hover:bg-indigo-400 disabled:opacity-50 transition">
+          <button onClick={handleCreate} disabled={!areaId || !prompt || !answer || pending} className="rounded-2xl bg-indigo-500 px-3 sm:px-4 py-2 text-sm sm:text-base font-semibold hover:bg-indigo-400 disabled:opacity-50 transition">
             {pending ? "Adding..." : "Add Item"}
           </button>
         </div>

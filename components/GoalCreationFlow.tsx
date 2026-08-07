@@ -10,10 +10,9 @@ type Step = "title" | "why" | "timeline" | "time";
 interface GoalCreationFlowProps {
   onClose?: () => void;
   onGoalCreated?: () => void;
-  userId: string;
 }
 
-export function GoalCreationFlow({ onClose, onGoalCreated, userId }: GoalCreationFlowProps) {
+export function GoalCreationFlow({ onClose, onGoalCreated }: GoalCreationFlowProps) {
   const [step, setStep] = useState<Step>("title");
   const [pending, startTransition] = useTransition();
 
@@ -43,13 +42,7 @@ export function GoalCreationFlow({ onClose, onGoalCreated, userId }: GoalCreatio
   const handleCreate = async () => {
     startTransition(async () => {
       try {
-        // Require userId to be present. If missing, abort create and log error.
-        if (!userId) {
-          console.error("GoalCreationFlow: missing userId; cannot create goal.");
-          return;
-        }
-
-        const result = await createGoalAction(userId, {
+        const result = await createGoalAction({
           title: formData.title,
           dailyMinutes: parseInt(formData.dailyMinutes.match(/\d+/)?.[0] || "30"),
           deadline: undefined,

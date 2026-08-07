@@ -1,160 +1,189 @@
 # Contributing to CODEXEDOC
 
-First off, thank you for your interest in contributing! 
+Thank you for your interest in contributing to **CODEXEDOC**! We are building an open-source Learning Operating System designed to empower learners through evidence-based cognitive science.
 
-CODEXEDOC is an open-source learning platform. Its purpose is not to create educational content, but rather to provide the infrastructure and tools that help users create, organize, review, and master their own knowledge. We are transitioning into a community-driven open-source project, and we want your contributor experience to be simple, welcoming, and professional.
+We welcome contributions of all kinds: bug fixes, feature implementations, documentation improvements, unit tests, and design enhancements.
 
----
-
-## Contributor License Agreement
-
-By submitting a pull request, you certify that:
-
-- You wrote the contributed code or have the legal right to contribute it.
-- Your contribution may be distributed under the GNU Affero General Public License v3.0 (AGPL-3.0).
-- You understand your contribution becomes part of the CODEXEDOC project and will remain licensed under the AGPL.
-
-By opening a pull request, you agree to these terms.
+This document provides a step-by-step guide to help you get started quickly and smoothly.
 
 ---
 
-## Before You Start
+## Table of Contents
 
-Before diving into the code, we recommend taking a moment to:
-
-- **Check existing Issues:** Ensure someone isn't already working on the problem you found.
-- **Search Discussions:** Your idea or question might have already been discussed.
-- **Read relevant ADRs:** Architecture Decision Records (ADRs) outline our technical decisions. Read them before making architectural changes.
-- **Discuss large changes:** If you're working on a significant feature or refactor, start a discussion before implementing it.
-- **Claim an issue:** If you'd like to work on an existing issue, leave a comment so others know it's being worked on.
+- [Code of Conduct](#code-of-conduct)
+- [Quick Start Onboarding](#quick-start-onboarding)
+- [Understanding Community Mode](#understanding-community-mode)
+- [Architectural Invariants (What NOT to Modify)](#architectural-invariants-what-not-to-modify)
+- [Development Workflow](#development-workflow)
+- [Branch Naming Conventions](#branch-naming-conventions)
+- [Commit Message Guidelines](#commit-message-guidelines)
+- [Pull Request Process](#pull-request-process)
+- [Quality Standards & Build Validation](#quality-standards--build-validation)
+- [Community Roles & Progression](#community-roles--progression)
+- [Getting Help](#getting-help)
 
 ---
 
-## Development Setup
+## Code of Conduct
 
-To get started, follow the installation instructions in the project's **README.md**.
+All contributors are expected to uphold our [Code of Conduct](./CODE_OF_CONDUCT.md). Please be respectful, constructive, and welcoming in all interactions.
 
-Contributors should fully configure their local development environment before starting. If you do not have production credentials, you can run the project in **Community Mode**. This allows you to develop and test features locally without needing access to external production integrations.
+---
+
+## Quick Start Onboarding
+
+Getting started with CODEXEDOC takes under 2 minutes:
+
+```bash
+# 1. Fork and clone the repository
+git clone https://github.com/YOUR_USERNAME/codexedoc.git
+cd codexedoc
+
+# 2. Install dependencies using pnpm
+pnpm install
+
+# 3. Create your local environment configuration from template
+cp .env.example .env.local
+
+# 4. Start the local development server
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser. You will land directly in **Community Mode** with a fully functional dashboard and test data available out of the box!
+
+---
+
+## Understanding Community Mode
+
+CODEXEDOC operates on an environment-driven authentication architecture defined in [ADR-002](./docs/architecture/ADR-002-Authentication.md).
+
+By default, `.env.example` ships with:
+
+```env
+USE_AUTH=false
+```
+
+### Key Principles of Community Mode:
+1. **Zero Setup Friction:** You do NOT need cloud accounts, API keys (Resend, Turnstile, Neon), or local PostgreSQL database configurations.
+2. **Deterministic Developer Identity:** The system automatically authenticates you as `mock-user` (`Mock Learner`, `demo@codexedoc.com`).
+3. **Data Persistence:** Sample Goals, Categories, and Knowledge Items remain intact across server restarts.
+4. **Server-Side Identity:** Even in Community Mode, Server Actions resolve caller identity via `serverAuth.requireUser()`. The frontend never sends or controls user identifiers.
+
+---
+
+## Architectural Invariants (What NOT to Modify)
+
+To maintain a clean, stable architecture across our open-source contributor ecosystem, please adhere strictly to these architectural boundaries:
+
+> 🛑 **DO NOT MODIFY:**
+> - **Provider Contracts (`lib/auth/contracts/IAuthProvider.ts`):** The core authentication interface must remain uniform.
+> - **Authentication Gateway (`lib/auth/gateway/serverAuth.ts`):** Gateway resolution logic is locked.
+> - **Local Development Provider (`lib/auth/providers/LocalDevAuthProvider.ts`):** Local dev provider behavior must remain deterministic.
+> - **Production Auth Provider (`lib/auth/providers/ProductionAuthProvider.ts`):** Changes to production auth require Maintainer review.
+> - **Domain Boundaries (`server/actions/`, `server/mutations/`):** Server actions must consume `serverAuth.requireUser()`. Never pass `userId` as a parameter from client components.
 
 ---
 
 ## Development Workflow
 
-Our contributor workflow is designed to be straightforward.
+CODEXEDOC follows single-branch consolidation on `main` per [ADR-001](./docs/architecture/ADR-001-Branching-Strategy.md).
 
-```mermaid
-graph TD
-    A[Issue] --> B[Create Feature Branch]
-    B --> C[Development]
-    C --> D[Commit]
-    D --> E[Push]
-    E --> F[Pull Request]
-    F --> G[Review]
-    G --> H[Merge]
+1. **Keep `main` Updated:** Sync your local `main` branch with upstream before starting new work:
+   ```bash
+   git checkout main
+   git pull upstream main
+   ```
+2. **Create a Feature Branch:** Branch off `main` using our naming conventions:
+   ```bash
+   git checkout -b feature/add-item-tagging
+   ```
+3. **Implement Changes:** Write clean TypeScript code following domain-driven boundaries ([ADR-003](./docs/architecture/ADR-003-Project-Structure.md)).
+4. **Validate Your Work:** Run build and typechecks locally before committing (see below).
+
+---
+
+## Branch Naming Conventions
+
+Use clear, descriptive prefix names for your branches:
+
+- `feature/short-description` — New features or UI additions (e.g. `feature/dark-mode-toggle`)
+- `fix/short-description` — Bug fixes and patch resolutions (e.g. `fix/session-timer-overflow`)
+- `docs/short-description` — Documentation additions or edits (e.g. `docs/update-adr-002`)
+- `refactor/short-description` — Code improvements without functional changes (e.g. `refactor/query-actions`)
+
+---
+
+## Commit Message Guidelines
+
+We follow **Conventional Commits** to keep our git history readable and automated release notes clean:
+
+```text
+<type>(<scope>): <short description>
+```
+
+### Allowed Types:
+- `feat`: A new feature for users
+- `fix`: A bug fix
+- `docs`: Documentation updates
+- `style`: Formatting, missing semi-colons, whitespace fixes
+- `refactor`: Refactoring production code without behavior changes
+- `test`: Adding or correcting tests
+- `chore`: Build process, package updates, or tool maintenance
+
+### Examples:
+```bash
+git commit -m "feat(items): add tag filtering to knowledge items list"
+git commit -m "fix(auth): handle expired session token gracefully"
+git commit -m "docs(readme): update onboarding quickstart steps"
 ```
 
 ---
 
-## Branch Naming
+## Pull Request Process
 
-We use descriptive branch names to keep our repository organized. 
-
-Recommended format:
-
-- `feature/dashboard`
-- `feature/reviews`
-- `feature/goals`
-- `feature/auth`
-- `fix/navbar`
-- `docs/architecture`
-- `refactor/reviews`
-- `chore/dependencies`
-
-Descriptive branch names are preferred over simple issue numbers because they help everyone understand the purpose of the branch at a glance.
+1. **Title:** Use Conventional Commit format for your PR title (e.g., `feat(ui): add Community Mode badge`).
+2. **Description:** Fill out the PR template describing:
+   - What changed
+   - Why the change was made
+   - How you verified your changes
+3. **Keep PRs Focused:** Small, single-purpose Pull Requests are reviewed and merged significantly faster than large multi-feature PRs.
+4. **Build Check:** Ensure `pnpm run build` succeeds cleanly before requesting review.
 
 ---
 
-## Commit Messages
+## Quality Standards & Build Validation
 
-We strictly follow the [Conventional Commits](https://www.conventionalcommits.org/) specification. This helps us generate automated changelogs and trace project history clearly.
+Before submitting your Pull Request, run local verification:
 
-**Examples:**
+```bash
+# 1. Typecheck TypeScript across the project
+npx tsc --noEmit
 
-- `feat(goals): add study session`
-- `fix(auth): prevent redirect loop`
-- `docs(architecture): add ADR-002`
-- `refactor(reviews): simplify review service`
-- `chore(deps): update dependencies`
+# 2. Verify Next.js production build
+pnpm run build
+```
 
----
-
-## Pull Requests
-
-When you are ready to share your work, open a Pull Request.
-
-**PR Checklist:**
-
-- **Describe changes:** Clearly explain what your PR does and why.
-- **Link Issues:** Reference any related issues (e.g., "Fixes #123").
-- **Update documentation when necessary:** Keep `README.md` and other docs up to date.
-- **Keep PRs focused:** Limit your PR to a single feature or bug fix.
-- **Request review:** Tag a core contributor or maintainer for review.
-- **Respond to feedback professionally:** Collaborate with reviewers to polish your code. Ensure all checks pass.
+Your Pull Request will automatically run CI checks against both `LocalDevAuthProvider` and `ProductionAuthProvider` to ensure behavioral parity.
 
 ---
 
-## Code Style
+## Community Roles & Progression
 
-We maintain high standards for code quality to keep the project sustainable.
+CODEXEDOC encourages a structured progression for contributors per [ADR-004](./docs/architecture/ADR-004-Contributor-Workflow.md):
 
-- **Use TypeScript:** We strictly use TypeScript. 
-- **Prefer reusable components:** Build UI elements that can be shared across the application.
-- **Avoid unnecessary complexity:** Keep logic straightforward.
-- **Follow existing conventions:** Stick to the established patterns in the codebase.
-- **Write self-documenting code:** Use meaningful variables and function names.
-- **Keep functions small:** Break down large blocks of logic.
-- **Run lint before submitting:** Always run our linting scripts locally before pushing your code.
+- **Community Contributor:** Clones the repository, submits bug reports, fixes issues, improves docs, and submits PRs.
+- **Core Contributor:** Experienced contributors who understand domain boundaries, review community PRs, and guide new contributors.
+- **Maintainer:** Responsible for overall project direction, architecture reviews, release tagging, and deployments.
+- **Founder / COO:** Oversees project vision, legal governance, and long-term organizational strategy.
 
 ---
 
-## Documentation
+## Getting Help
 
-Documentation is a first-class citizen in CODEXEDOC. You should update or add documentation when introducing a:
+We want your contributor experience to be fantastic! If you have questions or need guidance:
 
-- **New feature** (update user guides or the README).
-- **Architecture change** (propose or update an ADR).
-- **New workflow** or process.
-- **Public API** or widely used internal interface.
+- Open a GitHub Discussion or Issue.
+- Tag your issue with `question` or `good-first-issue`.
+- Join our community Discord and chat in `#contributing`.
 
----
-
-## Communication
-
-Good communication is essential. Here is where we discuss things:
-
-- **GitHub Issues:** For actionable tasks, clear feature requests, and bug reports.
-- **GitHub Discussions:** For broader ideas, Q&A, and general conversations.
-- **Discord:** For real-time chat and community building.
-- **Architecture discussions:** Should always happen in Discussions or Issues (via ADR proposals) before any code is written.
-
-**When to ask questions:**
-Don't hesitate to ask if you've spent more than a reasonable amount of time stuck on a problem!
-
----
-
-## Community Roles
-
-Our project thrives on a structured contributor progression:
-
-- **Community Contributor:** Submits issues, fixes bugs, improves docs, and participates in discussions.
-- **Core Contributor:** Experienced contributors who understand the codebase deeply, review PRs, and guide others.
-- **Maintainer:** Responsible for the strategic direction, final PR approvals, and releases.
-- **Founder / COO:** Oversees the project's long-term vision, governance, and organizational operations.
-
-*(For a deeper dive into these roles and the promotion paths, see our Contributor Workflow ADR).*
-
----
-
-## Need Help?
-
-We want your contribution experience to be fantastic. If you ever get stuck, need clarification on an issue, or just want to introduce yourself, please drop a message in our Discord, or leave a comment on the GitHub issue you are working on. We're here to help!
+Thank you for helping make CODEXEDOC better for learners everywhere! 🚀

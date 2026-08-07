@@ -1,198 +1,237 @@
-# CODEXEDOC
+# CODEXEDOC — Learning Operating System
 
-![License](https://img.shields.io/github/license/codexedoc-com/codexedoc)
-![Issues](https://img.shields.io/github/issues/codexedoc-com/codexedoc)
-![Contributors](https://img.shields.io/github/contributors/codexedoc-com/codexedoc)
-![Stars](https://img.shields.io/github/stars/codexedoc-com/codexedoc)
+[![License](https://img.shields.io/github/license/codexedoc-com/codexedoc)](https://github.com/codexedoc-com/codexedoc/blob/main/LICENSE)
+[![Issues](https://img.shields.io/github/issues/codexedoc-com/codexedoc)](https://github.com/codexedoc-com/codexedoc/issues)
+[![Contributors](https://img.shields.io/github/contributors/codexedoc-com/codexedoc)](https://github.com/codexedoc-com/codexedoc/graphs/contributors)
+[![Stars](https://img.shields.io/github/stars/codexedoc-com/codexedoc)](https://github.com/codexedoc-com/codexedoc/stargazers)
 
-**CODEXEDOC** is an open-source Learning Operating System designed to help people learn anything more effectively using evidence-based learning science.
+**CODEXEDOC** is an open-source **Learning Operating System** designed to help learners organize knowledge, build structured study habits, and achieve long-term mastery using evidence-based learning science.
 
-> 🚧 **Project Status:** Active Development. APIs, architecture, and workflows may evolve as the project grows toward its first public release.
+> 🚧 **Project Status:** Active Community Development (`main` branch consolidation). Built for frictionless open-source contribution out of the box using **Community Mode**.
 
 ---
 
-# Table of Contents
+## Table of Contents
 
 - [Overview](#overview)
-- [Features](#features)
+- [Core Features](#core-features)
 - [Why CODEXEDOC?](#why-codexedoc)
-- [Tech Stack](#tech-stack)
-- [Getting Started](#getting-started)
+- [System Architecture](#system-architecture)
+- [Prerequisites](#prerequisites)
+- [Quick Start Onboarding](#quick-start-onboarding)
 - [Community Mode](#community-mode)
-- [Architecture](#architecture)
-- [Documentation](#documentation)
-- [Contributing](#contributing)
+- [Project Structure](#project-structure)
+- [Documentation Index](#documentation-index)
+- [Contribution & Branch Strategy](#contribution--branch-strategy)
+- [Troubleshooting & FAQ](#troubleshooting--faq)
 - [License](#license)
-- [Acknowledgements](#acknowledgements)
 
 ---
 
-# Overview
+## Overview
 
-CODEXEDOC is more than a flashcard application or note-taking tool.
+CODEXEDOC is more than a flashcard tool or note-taking application. It is a comprehensive framework that connects courses, books, articles, and personal projects into a unified learning journey.
 
-It is a **Learning Operating System** designed to help learners organize knowledge, build effective study habits, and achieve long-term mastery using proven learning science.
+Rather than replacing learning content, CODEXEDOC provides the structured engine that guides practice, retains information, and tracks progress over time.
 
-Rather than replacing books, courses, or teachers, CODEXEDOC provides the framework that connects them together.
-
-Users can:
-
-- Define learning goals
-- Organize knowledge
-- Practice Active Recall
-- Schedule Spaced Repetition
-- Track mastery
-- Build learning habits
-- Review progress over time
+### Key Capabilities:
+- **Goal Blueprinting:** Define clear learning objectives and track target completion dates.
+- **Knowledge Hierarchy:** Categorize learning notes into structured learning areas.
+- **Active Recall & Spaced Repetition:** Schedule reviews based on difficulty and mastery levels.
+- **Progress & Analytics:** Monitor retention rates, study streaks, and study session lengths.
+- **Skill Trees:** Visualize domain progression across custom skill hierarchies.
 
 ---
 
-# Features
+## Core Features
 
-- 🎯 Goal Management
-- 🧠 Learning Blueprints
-- 📝 Knowledge Items
-- 🔁 Active Recall
-- 📅 Spaced Repetition
-- ⏱️ Focus Sessions
-- 📖 Reflection Journal
-- 🌳 Skill Trees
-- 📊 Learning Analytics
-- 🏆 Mastery Tracking
+| Feature | Description |
+|:---|:---|
+| 🎯 **Goal Management** | Track active goals, daily target minutes, and deadline timelines |
+| 🏷️ **Knowledge Areas** | Group flashcards, vocabulary, concepts, and facts into custom categories |
+| 🔁 **Active Recall** | Practice prompt-and-answer retrieval to strengthen long-term memory |
+| 📊 **Analytics Dashboard** | Track daily progress, reviews due, retention rates, and study streaks |
+| 🌳 **Interactive Skill Trees** | View visual representations of mastery across subject areas |
+| ⚡ **Community Mode** | Run the complete application locally without API keys or production databases |
 
 ---
 
-# Why CODEXEDOC?
+## Why CODEXEDOC?
 
-Learning resources are everywhere.
-
-Learning systems are not.
-
-CODEXEDOC combines evidence-based learning techniques into a single platform so users can focus on learning instead of managing disconnected notes, apps, and reminders.
+Learning materials are abundant, but evidence-based systems that structure long-term retention are rare. CODEXEDOC merges principles from cognitive science—such as active retrieval and spaced intervals—into an intuitive interface so learners can spend less time organizing notes and more time mastering topics.
 
 ---
 
-# Tech Stack
+## System Architecture
 
-- **Framework:** Next.js + TypeScript
-- **Database:** Drizzle ORM + PostgreSQL (Neon)
-- **Styling:** Tailwind CSS
-- **Hosting:** Vercel
-- **Repository:** GitHub
-
----
-
-# Getting Started
-
-```bash
-git clone https://github.com/codexedoc-com/codexedoc.git
-
-cd codexedoc
-
-npm install
-
-npm run dev
-```
-
-The project uses an environment-driven authentication system.
-
-See `.env.example` for local configuration.
-
----
-
-# Community Mode
-
-CODEXEDOC supports a **Community Mode** designed to make contributing simple.
-
-By default:
+CODEXEDOC follows a **Domain-Driven Architecture** and an **Environment-Driven Authentication Layer** designed to keep domain logic independent of external identity providers or database tiers.
 
 ```text
+┌─────────────────────────────────────────────────────────┐
+│                     Next.js App Router                  │
+│                     (src/app/ & UI)                     │
+└────────────────────────────┬────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────┐
+│              Authentication Gateway (serverAuth)         │
+│          Reads USE_AUTH env flag & injects provider     │
+└──────────────┬───────────────────────────┬──────────────┘
+               │                           │
+               ▼                           ▼
+  ┌─────────────────────────┐  ┌─────────────────────────┐
+  │   LocalDevAuthProvider  │  │ ProductionAuthProvider  │
+  │   (USE_AUTH=false)      │  │ (USE_AUTH=true)         │
+  │   Zero external keys    │  │ HTTP Cookies, Tokens,   │
+  │   Deterministic User    │  │ Production Database     │
+  └────────────┬────────────┘  └───────────┬─────────────┘
+               │                           │
+               └─────────────┬─────────────┘
+                             ▼
+┌─────────────────────────────────────────────────────────┐
+│              Business Domain Layer (src/domains)        │
+│          Server Actions consume serverAuth.requireUser() │
+└─────────────────────────────────────────────────────────┘
+```
+
+For detailed architectural decisions, see our [Architecture Decision Records (ADRs)](#documentation-index).
+
+---
+
+## Prerequisites
+
+Before setting up CODEXEDOC, ensure your development system has:
+
+- **Node.js:** `v18.17.0` or higher (Node 20+ recommended)
+- **pnpm:** `v8.x` or higher (`corepack enable pnpm` or `npm i -g pnpm`)
+- **Git:** `v2.30+`
+
+---
+
+## Quick Start Onboarding
+
+Set up and run CODEXEDOC locally in under **2 minutes**:
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/codexedoc-com/codexedoc.git
+cd codexedoc
+
+# 2. Install dependencies using pnpm
+pnpm install
+
+# 3. Create your local environment configuration from template
+cp .env.example .env.local
+
+# 4. Start the development server
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser. You will land directly in **Community Mode** with a fully functional dashboard and seeded test data!
+
+---
+
+## Community Mode
+
+To eliminate friction for open-source contributors, CODEXEDOC defaults to **Community Mode** (`USE_AUTH=false`).
+
+### What is Community Mode?
+- **Zero API Keys Required:** No accounts needed for Resend, Turnstile, or cloud databases.
+- **Deterministic Identity:** Automatically authenticates as `mock-user` (`Mock Learner`, `demo@codexedoc.com`).
+- **Data Stability:** Seeded mock data remains persistent across local server restarts.
+- **Full Feature Access:** Create goals, categories, knowledge items, edit items, and view analytics locally out of the box.
+
+```env
+# .env.local
 USE_AUTH=false
 ```
 
-Community Mode provides:
+When `USE_AUTH=false` is active, a subtle **Community Mode** badge appears in the bottom right corner of the UI to remind developers they are working in a local mock environment.
 
-- Zero production credentials required
-- Local development database
-- Deterministic development user
-- Immediate onboarding for contributors
+---
 
-Maintainers and staging environments simply enable:
+## Project Structure
 
 ```text
-USE_AUTH=true
+codexedoc/
+├── app/                        # Next.js App Router (Pages, Layouts, API Routes)
+├── components/                 # Reusable React UI Components
+│   └── CommunityModeBadge.tsx  # Non-intrusive Community Mode indicator
+├── lib/
+│   └── auth/                   # Authentication Abstraction Layer (ADR-002)
+│       ├── contracts/          # Interface definitions (IAuthProvider.ts)
+│       ├── providers/          # LocalDevAuthProvider & ProductionAuthProvider
+│       ├── gateway/            # Server Auth Gateway (serverAuth.ts)
+│       ├── session/            # Session Store Layer (sessionStore.ts)
+│       ├── utils/              # Token & HTTP Cookie management
+│       └── errors/             # Custom Auth Error Classes
+├── server/
+│   ├── actions/                # Server Actions (queryActions.ts)
+│   ├── mutations/              # Server Action Mutations (appMutations.ts)
+│   └── mockData.ts             # Deterministic Mock Data Tier
+├── docs/                       # Architecture Decision Records (ADRs)
+│   └── architecture/           # ADR-001, ADR-002, ADR-003, ADR-004
+├── .env.example                # Documented Environment Template
+├── CONTRIBUTING.md             # Contributor Guide
+└── README.md                   # Project Overview & Setup
 ```
 
-This architecture replaces the previous long-lived `mock` branch and allows every contributor to work from the same codebase.
+---
+
+## Documentation Index
+
+Explore our technical architecture and decision records in `docs/`:
+
+- 📘 [ADR-001 — Branching Strategy Strategy](./docs/architecture/ADR-001-Branching-Strategy.md): Single-branch consolidation on `main`.
+- 🔐 [ADR-002 — Authentication Architecture](./docs/architecture/ADR-002-Authentication.md): Provider abstraction & Community Mode.
+- 🏗️ [ADR-003 — Project Structure](./docs/architecture/ADR-003-Project-Structure.md): Domain-driven directory boundaries.
+- 👥 [ADR-004 — Contributor Workflow](./docs/architecture/ADR-004-Contributor-Workflow.md): Roles, PR standards, and review guidelines.
+- 🗺️ [Project Roadmap](./docs/architecture/Roadmap.md): Multi-phase development strategy.
+- 🤝 [CONTRIBUTING.md](./CONTRIBUTING.md): Detailed guide for new contributors.
 
 ---
 
-# Architecture
+## Contribution & Branch Strategy
 
-The project is evolving toward a Domain-Driven architecture.
+CODEXEDOC uses **single-branch consolidation** on `main` per [ADR-001](./docs/architecture/ADR-001-Branching-Strategy.md).
 
-```
-src/
-├── app/
-├── domains/
-├── shared/
-├── components/
-└── infrastructure/
-```
+### Workflow Overview:
+1. **Fork** the repository and create a feature branch off `main`:
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+2. Develop and test your changes locally using Community Mode (`USE_AUTH=false`).
+3. Validate your code before opening a PR:
+   ```bash
+   pnpm run build
+   ```
+4. Submit a Pull Request targeting `main`.
 
-Business domains remain independent from infrastructure concerns such as authentication, database access, and external services.
-
-Additional architectural decisions are documented under `/docs`.
-
----
-
-# Documentation
-
-Project documentation lives under the `docs/` directory.
-
-Key documents include:
-
-- ADR-001 — Branching Strategy
-- ADR-002 — Authentication Architecture
-- ADR-003 — Project Structure
-- ADR-004 — Contributor Workflow
-- CONTRIBUTING.md
-- CODE_OF_CONDUCT.md
-- SECURITY.md
-
-These documents describe the architectural decisions and contribution workflow used throughout the project.
+For detailed conventions on branch naming, commit messages, and PR reviews, read [`CONTRIBUTING.md`](./CONTRIBUTING.md).
 
 ---
 
-# Contributing
+## Troubleshooting & FAQ
 
-We welcome contributors of every experience level.
+### Q: Do I need PostgreSQL installed to develop locally?
+**A:** No! In Community Mode (`USE_AUTH=false`), CODEXEDOC runs entirely against the local deterministic memory provider out of the box.
 
-If you'd like to contribute:
+### Q: `pnpm dev` throws `FATAL: USE_AUTH=false is not allowed when NODE_ENV=production`
+**A:** Community Mode is strictly forbidden in production builds for security. If testing production builds locally, set `USE_AUTH=true` and configure `AUTH_SECRET` in `.env.local`.
 
-1. Read `CONTRIBUTING.md`
-2. Browse open Issues
-3. Join the Discord community
-4. Submit a Pull Request
-
-Our goal is to make contributing as frictionless as possible while maintaining a clean and secure architecture.
+### Q: How do I test production authentication?
+**A:** Set `USE_AUTH=true` and `AUTH_SECRET=your-random-32-char-secret` in `.env.local`. The system will automatically switch from `LocalDevAuthProvider` to `ProductionAuthProvider`.
 
 ---
 
-# License
+## License
 
 Copyright © 2026 CODEXEDOC
 
-Licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0-or-later).**
-
-See the `LICENSE` file for details.
+Licensed under the **GNU Affero General Public License v3.0** (`AGPL-3.0-or-later`). See the [`LICENSE`](./LICENSE) file for details.
 
 ---
 
-# Acknowledgements
+## Acknowledgements
 
-CODEXEDOC exists thanks to every developer, designer, educator, and learner who contributes to the project.
-
-Every issue, discussion, and pull request helps improve the future of learning.
-
-Thank you for being part of the project.
+CODEXEDOC exists thanks to our open-source community of developers, educators, and learners. Every issue, pull request, and architectural discussion helps shape the future of learning technology.
