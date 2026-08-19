@@ -44,6 +44,21 @@ export interface IAuthProvider {
   logout(): Promise<void>;
 
   /**
+   * Create an authenticated session for a verified user identity.
+   *
+   * Used by the email verification-code flow after the user's identity has
+   * been confirmed. Unlike `login()`, this method does not validate
+   * credentials — the caller is responsible for having already verified
+   * the user (e.g. via a one-time code).
+   *
+   * Sets the authentication cookie and returns the new session.
+   *
+   * @param user - The verified user identity.
+   * @returns The newly created `AuthSession`.
+   */
+  createSession(user: AuthUser): Promise<AuthSession>;
+
+  /**
    * Validate a session token and return the associated session if valid.
    *
    * @param token - The opaque session token to verify.

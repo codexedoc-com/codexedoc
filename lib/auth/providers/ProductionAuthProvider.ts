@@ -98,6 +98,18 @@ export class ProductionAuthProvider implements IAuthProvider {
   }
 
   /**
+   * Create an authenticated session for a verified user identity.
+   *
+   * Used by the email verification-code flow after successful code validation.
+   * Creates a session in the store and sets the secure HTTP-only cookie.
+   */
+  async createSession(user: AuthUser): Promise<AuthSession> {
+    const session = await sessionStore.createSession(user);
+    await setAuthCookie(session.token, session.expiresAt);
+    return session;
+  }
+
+  /**
    * Validate session token and return active `AuthSession` or `null`.
    *
    * @param token - Session token to verify.

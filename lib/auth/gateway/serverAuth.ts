@@ -12,7 +12,7 @@ import { ConfigurationError } from "../errors";
  *
  * **Safety Invariants (ADR-002):**
  * 1. Community Mode (`USE_AUTH=false`) must NEVER run in `NODE_ENV=production`.
- * 2. Production Mode (`USE_AUTH=true`) requires valid authentication secrets (`AUTH_SECRET` or `JWT_SECRET`).
+ * 2. Production Mode (`USE_AUTH=true`) requires valid authentication secret (`AUTH_SECRET`).
  *
  * @example
  * ```ts
@@ -41,7 +41,7 @@ if (nodeEnv === "production" && useAuth === "false") {
     "  It is strictly forbidden in production builds per ADR-002 (Security Boundary Invariant).\n\n" +
     "HOW TO FIX IT:\n" +
     "  1. Set USE_AUTH=true in your environment variables or platform deployment settings.\n" +
-    "  2. Configure AUTH_SECRET or JWT_SECRET with a 32+ character random secret string.\n" +
+    "  2. Configure AUTH_SECRET with a 32+ character random secret string.\n" +
     "--------------------------------------------------------------------------------\n"
   );
 }
@@ -51,15 +51,15 @@ if (nodeEnv === "production" && useAuth === "false") {
 function resolveProvider(): IAuthProvider {
   // USE_AUTH is "true" → Production Mode
   if (useAuth === "true") {
-    const secret = process.env.AUTH_SECRET || process.env.JWT_SECRET;
+    const secret = process.env.AUTH_SECRET;
     if (!secret || secret.trim().length < 8) {
       throw new ConfigurationError(
         "\n[CODEXEDOC AUTHENTICATION GATEWAY ERROR]\n" +
         "--------------------------------------------------------------------------------\n" +
         "WHAT HAPPENED:\n" +
-        "  USE_AUTH=true is enabled but no valid AUTH_SECRET or JWT_SECRET was found.\n\n" +
+        "  USE_AUTH=true is enabled but no valid AUTH_SECRET was found.\n\n" +
         "WHY THIS IS INVALID:\n" +
-        "  Production Mode requires a cryptographic secret key to sign and verify session tokens.\n\n" +
+        "  Production Mode requires AUTH_SECRET configured as an operational safeguard.\n\n" +
         "HOW TO FIX IT:\n" +
         "  1. Add AUTH_SECRET to your .env.local file or deployment environment settings.\n" +
         "  2. Provide a secret string at least 16 characters long (e.g. openssl rand -base64 32).\n" +

@@ -69,6 +69,15 @@ export class LocalDevAuthProvider implements IAuthProvider {
   }
 
   /**
+   * In Community Mode, createSession always returns the deterministic dev
+   * session. The provided user is accepted but ignored — the dev user is
+   * always the same for consistency with seeded mock data.
+   */
+  async createSession(_user: AuthUser): Promise<AuthSession> {
+    return this.getDevSession();
+  }
+
+  /**
    * In Community Mode every token is considered valid.
    * Returns the deterministic dev session regardless of the token value.
    */
