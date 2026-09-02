@@ -1,7 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Target, BookOpen, Volume2, PenTool } from "lucide-react";
+import { Brain, Sparkles, CheckCircle2, ChevronRight, Layers } from "lucide-react";
 
 interface SkillNode {
   name: string;
@@ -9,147 +8,81 @@ interface SkillNode {
   children?: SkillNode[];
 }
 
-const skillTreeData: SkillNode = {
-  name: "Overall Learning",
-  percentage: 45,
-  children: [
-    {
-      name: "Speaking",
-      percentage: 63,
-      children: [
-        { name: "Introductions", percentage: 100 },
-        { name: "Questions", percentage: 75 },
-        { name: "Opinions", percentage: 20 },
-      ],
-    },
-    { name: "Listening", percentage: 45 },
-    { name: "Reading", percentage: 30 },
-    { name: "Writing", percentage: 15 },
-  ],
-};
-
-interface SkillItemProps {
-  skill: SkillNode;
-  depth: number;
+interface SkillTreeProps {
+  treeData?: SkillNode;
 }
 
-function SkillItem({ skill, depth }: SkillItemProps) {
-  const getIcon = (name: string) => {
-    if (name.includes("Speaking")) return <BookOpen className="h-5 w-5" />;
-    if (name.includes("Listening")) return <Volume2 className="h-5 w-5" />;
-    if (name.includes("Reading")) return <BookOpen className="h-5 w-5" />;
-    if (name.includes("Writing")) return <PenTool className="h-5 w-5" />;
-    return <Target className="h-5 w-5" />;
+export function SkillTree({ treeData }: SkillTreeProps) {
+  const root = treeData || {
+    name: "Overall Learning",
+    percentage: 0,
+    children: [],
   };
 
-  const bgColors = [
-    "bg-indigo-500/10",
-    "bg-cyan-500/10",
-    "bg-purple-500/10",
-  ];
-  const borderColors = [
-    "border-indigo-500/30",
-    "border-cyan-500/30",
-    "border-purple-500/30",
-  ];
-
-  const bgColor = bgColors[depth % bgColors.length];
-  const borderColor = borderColors[depth % borderColors.length];
-  const paddingLeft = `${depth * 1.5}rem`;
-
   return (
-    <motion.div
-      initial={{ opacity: 0, x: -10 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.3 }}
-      style={{ paddingLeft }}
-      className="space-y-3"
-    >
-      <div className={`rounded-2xl border ${borderColor} ${bgColor} p-4 backdrop-blur-xl`}>
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="text-indigo-300">{getIcon(skill.name)}</div>
-            <div>
-              <p className="font-semibold text-white">{skill.name}</p>
-            </div>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-base font-bold text-zinc-900">Topic Mastery Breakdown</h3>
+          <p className="text-xs text-zinc-500">Calculated from your spaced repetition reviews.</p>
+        </div>
+        <div className="text-right">
+          <span className="text-sm font-bold text-indigo-600">{root.percentage}% Mastery</span>
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-zinc-200/80 bg-white p-5 sm:p-6 shadow-xs space-y-4">
+        {/* Overall Progress Bar */}
+        <div>
+          <div className="flex justify-between text-xs font-semibold text-zinc-700 mb-1.5">
+            <span>Overall Goal Mastery</span>
+            <span>{root.percentage}%</span>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="min-w-[80px]">
-              <div className="h-2 overflow-hidden rounded-full bg-white/10">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${skill.percentage}%` }}
-                  transition={{ duration: 0.6 }}
-                  className="h-full bg-gradient-to-r from-indigo-500 to-cyan-400"
-                />
+          <div className="h-2 w-full bg-zinc-100 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-indigo-600 transition-all duration-500 rounded-full"
+              style={{ width: `${root.percentage}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Topics List */}
+        <div className="divide-y divide-zinc-100 pt-2">
+          {root.children && root.children.length > 0 ? (
+            root.children.map((child) => (
+              <div key={child.name} className="py-3 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                  <div className="h-7 w-7 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-600 flex-shrink-0 text-xs">
+                    <Layers className="h-3.5 w-3.5" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-zinc-900 truncate">{child.name}</p>
+                    {child.children?.[0]?.name && (
+                      <p className="text-[11px] text-zinc-400 truncate">{child.children[0].name}</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 flex-shrink-0">
+                  <div className="w-24 h-1.5 bg-zinc-100 rounded-full overflow-hidden hidden sm:block">
+                    <div
+                      className="h-full bg-indigo-600 rounded-full transition-all"
+                      style={{ width: `${child.percentage}%` }}
+                    />
+                  </div>
+                  <span className="text-xs font-bold text-zinc-700 w-9 text-right">
+                    {child.percentage}%
+                  </span>
+                </div>
               </div>
-            </div>
-            <span className="min-w-[40px] text-right font-bold text-white">{skill.percentage}%</span>
-          </div>
+            ))
+          ) : (
+            <p className="text-xs text-zinc-400 py-4 text-center">
+              Add knowledge items and complete reviews to build your mastery tree.
+            </p>
+          )}
         </div>
       </div>
-
-      {skill.children && skill.children.length > 0 && (
-        <div className="space-y-3">
-          {skill.children.map((child) => (
-            <SkillItem key={child.name} skill={child} depth={depth + 1} />
-          ))}
-        </div>
-      )}
-    </motion.div>
-  );
-}
-
-export function SkillTree() {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.3 }}
-      className="space-y-4 sm:space-y-6"
-    >
-      {/* Header */}
-      <div>
-        <p className="text-xs sm:text-sm text-white/50">Skill Mastery</p>
-        <h3 className="mt-1 text-lg sm:text-2xl font-black">Your Skill Tree</h3>
-      </div>
-
-      {/* Tree Container */}
-      <div className="rounded-2xl sm:rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-8 backdrop-blur-xl overflow-x-auto">
-        <SkillItem skill={skillTreeData} depth={0} />
-      </div>
-
-      {/* Legend */}
-      <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
-        <div className="rounded-xl sm:rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
-          <p className="text-xs sm:text-sm text-white/50">Mastery Levels</p>
-          <div className="mt-2 sm:mt-3 space-y-1.5 sm:space-y-2">
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-5 rounded-full bg-red-500/50" />
-              <span className="text-xs sm:text-sm text-white/70">0-25%: Learning</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-6 rounded-full bg-yellow-500/50" />
-              <span className="text-xs sm:text-sm text-white/70">25-50%: Familiar</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-6 rounded-full bg-cyan-500/50" />
-              <span className="text-xs sm:text-sm text-white/70">50-75%: Strong</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-6 rounded-full bg-green-500/50" />
-              <span className="text-xs sm:text-sm text-white/70">75-100%: Mastered</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-indigo-500/20 bg-indigo-500/10 p-3 sm:p-4">
-          <p className="text-xs sm:text-sm text-indigo-200">💡 Tip</p>
-          <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-indigo-200/80">
-            Focus on areas below 50% to unlock faster growth. Your weakest skills deserve the most attention.
-          </p>
-        </div>
-      </div>
-    </motion.div>
+    </div>
   );
 }

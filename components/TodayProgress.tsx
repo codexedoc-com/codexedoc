@@ -1,13 +1,13 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Flame, BookOpen, Target, Zap } from "lucide-react";
+import { Flame, BookOpen, Target, Zap, Clock } from "lucide-react";
 
 interface TodayProgressProps {
   reviewsDue: number;
   newItems: number;
   practiceTasks: number;
   streak: number;
+  onStartReview?: () => void;
 }
 
 export function TodayProgress({
@@ -15,55 +15,50 @@ export function TodayProgress({
   newItems,
   practiceTasks,
   streak,
+  onStartReview,
 }: TodayProgressProps) {
-  const stats = [
-    { label: "Reviews Due", value: reviewsDue, icon: BookOpen, color: "text-indigo-300" },
-    { label: "New Items", value: newItems, icon: Zap, color: "text-cyan-300" },
-    { label: "Practice Tasks", value: practiceTasks, icon: Target, color: "text-cyan-300" },
-  ];
-
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="space-y-4 sm:space-y-6"
-    >
-      {/* Header */}
-      <div>
-        <p className="text-sm text-white/50">Today&apos;s Progress</p>
-        <div className="mt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-2">
-          <h3 className="text-xl sm:text-2xl font-black">Your Daily Dashboard</h3>
-          <div className="flex items-center gap-2 rounded-2xl bg-green-500/10 px-3 sm:px-4 py-2 text-xs sm:text-sm text-green-300">
-            <Flame className="h-3 w-3 sm:h-4 sm:w-4" />
-            {streak} Day Streak
-          </div>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-base font-bold text-zinc-900">Today&apos;s Review Queue</h3>
+          <p className="text-xs text-zinc-500">Active spaced repetition tasks for today.</p>
+        </div>
+
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-xs font-semibold text-amber-800">
+          <Flame className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
+          <span>{streak} Day Streak</span>
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid gap-3 grid-cols-1 xs:grid-cols-2 sm:grid-cols-3">
-        {stats.map((stat, index) => {
-          const Icon = stat.icon;
-          return (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="rounded-2xl sm:rounded-3xl border border-white/10 bg-white/5 p-3 sm:p-5 backdrop-blur-xl hover:bg-white/8 transition"
-            >
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <p className="text-xs sm:text-sm text-white/50">{stat.label}</p>
-                  <h4 className="mt-1 sm:mt-2 text-2xl sm:text-4xl font-black">{stat.value}</h4>
-                </div>
-                <Icon className={`h-5 w-5 sm:h-6 sm:w-6 ${stat.color}`} />
-              </div>
-            </motion.div>
-          );
-        })}
+      <div className="grid grid-cols-3 gap-3">
+        {/* Due Card */}
+        <div className="p-4 rounded-2xl border border-zinc-200/80 bg-white shadow-xs">
+          <div className="flex items-center justify-between text-zinc-400 mb-2">
+            <span className="text-xs font-medium text-zinc-500">Reviews Due</span>
+            <BookOpen className="h-4 w-4 text-indigo-600" />
+          </div>
+          <p className="text-2xl font-bold text-zinc-900">{reviewsDue}</p>
+        </div>
+
+        {/* New Items */}
+        <div className="p-4 rounded-2xl border border-zinc-200/80 bg-white shadow-xs">
+          <div className="flex items-center justify-between text-zinc-400 mb-2">
+            <span className="text-xs font-medium text-zinc-500">Added Today</span>
+            <Zap className="h-4 w-4 text-cyan-600" />
+          </div>
+          <p className="text-2xl font-bold text-zinc-900">{newItems}</p>
+        </div>
+
+        {/* Practice Tasks */}
+        <div className="p-4 rounded-2xl border border-zinc-200/80 bg-white shadow-xs">
+          <div className="flex items-center justify-between text-zinc-400 mb-2">
+            <span className="text-xs font-medium text-zinc-500">Mastery Target</span>
+            <Target className="h-4 w-4 text-emerald-600" />
+          </div>
+          <p className="text-2xl font-bold text-zinc-900">{practiceTasks}</p>
+        </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Sparkles } from "lucide-react";
+import { X, Sparkles, FolderPlus } from "lucide-react";
 import { createLearningAreaAction } from "@/server/mutations/appMutations";
 
 interface Props {
@@ -15,10 +15,10 @@ export default function CreateCategoryModal({ goalId, onClose, onCreated }: Prop
   const [pending, setPending] = useState(false);
 
   const handleCreate = async () => {
-    if (!name) return;
+    if (!name.trim()) return;
     setPending(true);
     try {
-      const result = await createLearningAreaAction(goalId, name);
+      const result = await createLearningAreaAction(goalId, name.trim());
       if (result?.success) {
         onCreated?.();
       } else {
@@ -31,35 +31,58 @@ export default function CreateCategoryModal({ goalId, onClose, onCreated }: Prop
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white/5 p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-indigo-500/20 bg-indigo-500/10 px-3 py-1 text-sm text-indigo-200">
-              <Sparkles className="h-3 w-3" /> Create Category
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/60 backdrop-blur-xs p-4">
+      <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl">
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="h-8 w-8 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600">
+              <FolderPlus className="h-4 w-4" />
             </div>
-            <h3 className="text-2xl font-black">New Category</h3>
+            <div>
+              <h3 className="text-lg font-bold text-zinc-900">New Learning Topic</h3>
+              <p className="text-xs text-zinc-500">Group your flashcards into structured modules.</p>
+            </div>
           </div>
-          <button onClick={onClose} className="text-white/60 hover:text-white">✕</button>
+          <button
+            onClick={onClose}
+            className="text-zinc-400 hover:text-zinc-700 p-1 rounded-lg hover:bg-zinc-100 transition cursor-pointer"
+          >
+            <X className="h-5 w-5" />
+          </button>
         </div>
 
-        <div className="mt-6">
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="e.g., Introductions"
-            className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-white/50 focus:outline-none"
-          />
+        <div className="mt-5 space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-zinc-700 mb-1">
+              Topic Name
+            </label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g., Hooks & Lifecycle, Grammar Basics..."
+              className="w-full rounded-xl border border-zinc-200 px-3.5 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 focus:outline-none"
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleCreate();
+              }}
+            />
+          </div>
         </div>
 
-        <div className="mt-6 flex justify-end gap-3">
-          <button onClick={onClose} className="rounded-2xl bg-white/5 px-4 py-2 font-semibold">Cancel</button>
+        <div className="mt-6 flex justify-end gap-2.5">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 rounded-xl text-xs font-semibold text-zinc-600 hover:bg-zinc-100 transition cursor-pointer"
+          >
+            Cancel
+          </button>
           <button
             onClick={handleCreate}
-            disabled={!name || pending}
-            className="rounded-2xl bg-indigo-500 px-4 py-2 font-semibold disabled:opacity-50"
+            disabled={!name.trim() || pending}
+            className="px-5 py-2 rounded-xl bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-500 disabled:opacity-50 transition cursor-pointer shadow-xs"
           >
-            {pending ? "Creating..." : "Create"}
+            {pending ? "Creating..." : "Create Category"}
           </button>
         </div>
       </div>

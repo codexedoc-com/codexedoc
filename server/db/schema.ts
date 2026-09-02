@@ -29,7 +29,7 @@ export const users = pgTable("users", {
 SESSIONS
 ========================= */
 
-export const authSessions = pgTable("sessions", {
+export const authSessions = pgTable("auth_sessions", {
   id: uuid("id").defaultRandom().primaryKey(),
 
   userId: uuid("user_id")
@@ -180,7 +180,7 @@ export const reviews = pgTable("reviews", {
 SESSIONS (DAILY LEARNING)
 ========================= */
 
-export const studySessions = pgTable("sessions", {
+export const studySessions = pgTable("study_sessions", {
   id: uuid("id").defaultRandom().primaryKey(),
 
   userId: uuid("user_id")

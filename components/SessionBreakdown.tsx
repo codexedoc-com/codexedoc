@@ -1,71 +1,62 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Target } from "lucide-react";
+import { Brain, Play, Sparkles, Clock } from "lucide-react";
 
-export function SessionBreakdown() {
+interface SessionBreakdownProps {
+  onStartSession?: () => void;
+  dailyMinutes?: number;
+}
+
+export function SessionBreakdown({ onStartSession, dailyMinutes = 30 }: SessionBreakdownProps) {
   const segments = [
-    { label: "Review", minutes: 10, color: "bg-indigo-500" },
-    { label: "New Material", minutes: 10, color: "bg-cyan-500" },
-    { label: "Practice", minutes: 5, color: "bg-purple-500" },
-    { label: "Reflect", minutes: 5, color: "bg-green-500" },
+    { label: "SRS Review", minutes: Math.round(dailyMinutes * 0.45), color: "bg-indigo-600" },
+    { label: "New Cards", minutes: Math.round(dailyMinutes * 0.3), color: "bg-cyan-500" },
+    { label: "Practice", minutes: Math.round(dailyMinutes * 0.15), color: "bg-purple-500" },
+    { label: "Reflect", minutes: Math.round(dailyMinutes * 0.1), color: "bg-emerald-500" },
   ];
 
-  const totalMinutes = segments.reduce((sum, seg) => sum + seg.minutes, 0);
-
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.1 }}
-      className="rounded-2xl sm:rounded-3xl border border-indigo-500/20 bg-indigo-500/10 p-4 sm:p-8 backdrop-blur-xl space-y-4 sm:space-y-6"
-    >
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+    <div className="rounded-2xl border border-zinc-200/80 bg-white p-5 sm:p-6 shadow-xs space-y-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
-          <p className="text-xs sm:text-sm text-indigo-200/70">Recommended Session</p>
-          <h4 className="mt-1 sm:mt-2 text-lg sm:text-2xl font-black">{totalMinutes} Minute Focus Block</h4>
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-50 border border-indigo-100 text-[11px] font-semibold text-indigo-700 mb-1.5">
+            <Sparkles className="h-3 w-3" />
+            <span>Recommended Session</span>
+          </div>
+          <h4 className="text-lg font-bold text-zinc-900">{dailyMinutes} Minute Daily Focus Block</h4>
         </div>
-        <Target className="h-8 w-8 text-indigo-300" />
+
+        <button
+          onClick={onStartSession}
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-500 shadow-xs transition cursor-pointer"
+        >
+          <Play className="h-4 w-4 fill-white" />
+          Start Study Session
+        </button>
       </div>
 
-      {/* Time Breakdown */}
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
-        {segments.map((segment, index) => (
-          <motion.div
-            key={segment.label}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 + index * 0.05 }}
-            className="rounded-xl sm:rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4 text-center"
-          >
-            <div className={`h-1 rounded-full ${segment.color} mx-auto mb-2 sm:mb-3`} style={{ width: "20px" }} />
-            <p className="text-base sm:text-lg font-bold text-white">{segment.minutes}m</p>
-            <p className="mt-0.5 sm:mt-1 text-xs text-white/60">{segment.label}</p>
-          </motion.div>
+      {/* Segments breakdown */}
+      <div className="grid grid-cols-4 gap-2 pt-2">
+        {segments.map((segment) => (
+          <div key={segment.label} className="p-2.5 rounded-xl bg-zinc-50 border border-zinc-100 text-center">
+            <div className={`h-1.5 w-4 rounded-full ${segment.color} mx-auto mb-1.5`} />
+            <p className="text-sm font-bold text-zinc-900">{segment.minutes}m</p>
+            <p className="text-[10px] text-zinc-500 truncate">{segment.label}</p>
+          </div>
         ))}
       </div>
 
-      {/* Visual Progress Bar */}
-      <div className="space-y-2">
-        <p className="text-sm text-white/50">Session Breakdown</p>
-        <div className="flex h-3 gap-1 overflow-hidden rounded-full bg-white/5">
-          {segments.map((segment, index) => (
-            <motion.div
-              key={segment.label}
-              initial={{ width: 0 }}
-              animate={{ width: `${(segment.minutes / totalMinutes) * 100}%` }}
-              transition={{ duration: 0.6, delay: 0.3 + index * 0.05 }}
-              className={`${segment.color} transition-all`}
-              title={`${segment.label}: ${segment.minutes}m`}
-            />
-          ))}
-        </div>
+      {/* Segment bar */}
+      <div className="h-2 w-full bg-zinc-100 rounded-full overflow-hidden flex gap-0.5">
+        {segments.map((segment) => (
+          <div
+            key={segment.label}
+            className={`${segment.color} h-full transition-all`}
+            style={{ width: `${(segment.minutes / dailyMinutes) * 100}%` }}
+            title={`${segment.label}: ${segment.minutes}m`}
+          />
+        ))}
       </div>
-
-      {/* CTA */}
-      <button className="w-full rounded-2xl bg-gradient-to-r from-indigo-500 to-cyan-500 py-4 font-semibold text-white transition hover:shadow-lg hover:shadow-indigo-500/50">
-        Start Session
-      </button>
-    </motion.div>
+    </div>
   );
 }

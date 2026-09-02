@@ -7,9 +7,14 @@ import {
   ArrowLeft,
   ArrowRight,
   Lock,
+  Sparkles,
+  CheckCircle2,
+  BookOpen,
+  Brain,
+  Zap,
 } from "lucide-react";
 import Image from "next/image";
-
+import Link from "next/link";
 import { sendVerificationCode } from "@/server/actions/auth/sendVerificationCode";
 import { verifyCode } from "@/server/actions/auth/verifyCode";
 import { useRouter } from "next/navigation";
@@ -45,7 +50,7 @@ export default function AuthPage() {
 
     const fallbackTimer = window.setTimeout(() => {
       setTurnstileStatus("ready");
-    }, 5000);
+    }, 4000);
 
     return () => window.clearTimeout(fallbackTimer);
   }, [turnstileEnabled, turnstileStatus]);
@@ -61,7 +66,6 @@ export default function AuthPage() {
 
     startTransition(async () => {
       try {
-
         if (turnstileToken) {
           formData.set("cf-turnstile-response", turnstileToken);
         }
@@ -76,7 +80,7 @@ export default function AuthPage() {
         setStep("code");
         setMessage({
           type: "success",
-          text: "Verification code sent to your email.",
+          text: "Verification code sent. If testing locally without email, check your server console.",
         });
         setTurnstileToken("");
       } catch (error) {
@@ -95,21 +99,19 @@ export default function AuthPage() {
       try {
         const result = await verifyCode(formData);
 
-        // Success case - use the message from the server
         if (result?.success) {
           setMessage({
             type: "success",
-            text: result.message, // "Account created successfully!" or "Logged in successfully!"
+            text: result.message || "Authentication successful!",
           });
 
-          // Small delay so user can see the success message
           setTimeout(() => {
             setAuthenticated(true);
-          }, 800);
+          }, 600);
         } else {
           setMessage({
             type: "error",
-            text: "Unexpected response from server",
+            text: "Invalid response from server",
           });
         }
       } catch (error) {
@@ -119,294 +121,221 @@ export default function AuthPage() {
         });
       }
     });
-}
+  }
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#050816] text-white">
-
-      {/* Background Effects (MATCH HOMEPAGE) */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.25),transparent_40%)]" />
-      <div className="absolute left-1/2 top-0 h-150 w-150 -translate-x-1/2 rounded-full bg-cyan-500/10 blur-[140px]" />
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-70px_70px]" />
-
-      {/* Center Layout */}
-      <div className="relative z-10 flex min-h-screen items-center justify-center px-6 py-20">
-
-        {/* MAIN AUTH CARD */}
-      <div className="relative grid w-full max-w-6xl overflow-hidden rounded-[40px] border border-white/10 bg-white/5 backdrop-blur-2xl shadow-[0_0_80px_rgba(99,102,241,0.15)] lg:grid-cols-2">
-
-        {/* LEFT PANEL (Context / Branding) */}
-        <div className="relative hidden lg:flex flex-col justify-between items-center p-14 border-r border-white/10">
-
-          {/* background glow */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(99,102,241,0.25),transparent_60%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(34,211,238,0.15),transparent_60%)]" />
-
-          <div className="relative z-10 py-20">
-
-            <div className="mb-5 flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-500/10 border border-indigo-500/20">
-                <Image src="/codexedoc.png" alt="Logo" className="h-8 w-8" width={24} height={24} />
-              </div>
-              <h1 className="text-2xl font-black">CODEXEDOC</h1>
-            </div>
-
-            <h1 className="mt-8 text-6xl font-black leading-tight">
-              {mode === "login" ? (
-                <>
-                  Welcome<br />
-                  <span className="bg-linear-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
-                    Back.
-                  </span>
-                </>
-              ) : (
-                <>
-                  Create<br />
-                  <span className="bg-linear-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
-                    Account.
-                  </span>
-                </>
-              )}
-            </h1>
-
-            <p className="mt-6 text-lg text-white/60 max-w-md leading-relaxed">
-              {mode === "login"
-                ? "Jump back into your learning journey. Continue where you left off and keep building mastery."
-                : "Start your learning system. Build structured knowledge, track progress, and turn goals into mastery."}
-            </p>
-
+    <main className="min-h-screen bg-[#fafafa] flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      {/* Top Navbar Brand */}
+      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center mb-6">
+        <Link href="/" className="inline-flex items-center gap-2.5 transition hover:opacity-80">
+          <div className="h-9 w-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-sm shadow-indigo-200">
+            <Brain className="h-5 w-5" />
           </div>
+          <span className="text-xl font-bold tracking-tight text-zinc-900">CODEXEDOC</span>
+        </Link>
+      </div>
 
-        </div>
-
-        {/* RIGHT PANEL (FORM) */}
-        <div className="flex items-center justify-center p-10 sm:p-14">
-
-          <div className="w-full max-w-md">
-
-            {/* MOBILE HEADER */}
-            <div className="mb-10 flex items-center gap-3 lg:hidden">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-500/10 border border-indigo-500/20">
-                <Image src="/codexedoc.png" alt="Logo" className="h-8 w-8" width={24} height={24} />
-              </div>
-              <h1 className="text-xl font-black">CODEXEDOC</h1>
-            </div>
-
-            {/* TITLE */}
-            <div className="mb-8 lg:hidden">
-              <h2 className="text-4xl font-black tracking-tight">
-                {step === "email"
-                  ? mode === "register"
-                    ? "Create Account"
-                    : "Sign In"
-                  : "Verify Access"}
-              </h2>
-
-              <p className="mt-3 text-white/60">
-                {step === "email"
-                  ? mode === "login"
-                    ? "Continue your learning journey"
-                    : "Start building your learning system"
-                  : "Enter the 6-digit code sent to your email"}
-              </p>
-            </div>
-
-            {/* MODE TOGGLE */}
-            {step === "email" && (
-              <div className="mb-8 flex rounded-2xl border border-white/10 bg-white/5 p-1">
-                <button
-                  type="button"
-                  onClick={() => setMode("login")}
-                  className={`flex-1 rounded-xl py-3 text-sm font-semibold transition ${
-                    mode === "login"
-                      ? "bg-indigo-500 text-white"
-                      : "text-white/60 hover:text-white"
-                  }`}
-                >
-                  Login
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setMode("register")}
-                  className={`flex-1 rounded-xl py-3 text-sm font-semibold transition ${
-                    mode === "register"
-                      ? "bg-indigo-500 text-white"
-                      : "text-white/60 hover:text-white"
-                  }`}
-                >
-                  Register
-                </button>
-              </div>
-            )}
-
-
-
-            {/* EMAIL STEP */}
-            {step === "email" ? (
-              <form key="emailForm" action={handleSendCode} autoComplete="off" className="space-y-5">
-
-                <input
-                  type="text"
-                  name="contact_field"
-                  defaultValue=""
-                  autoComplete="off"
-                  tabIndex={-1}
-                  aria-hidden="true"
-                  style={{
-                    position: "absolute",
-                    left: "-9999px",
-                  }}
-                />
-
-                {mode === "register" && (
-                  <div>
-                    <label className="mb-2 block text-sm text-white/50">
-                      Username
-                    </label>
-
-                    <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-xl focus-within:border-indigo-500/30 transition">
-                      <User className="h-5 w-5 text-indigo-300/60" />
-                      <input
-                        name="username"
-                        autoComplete="username"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        placeholder="your name"
-                        className="w-full bg-transparent outline-none text-white/90"
-                        required
-                      />
-                    </div>
-                  </div>
-                )}
-
-                <div>
-                  <label className="mb-2 block text-sm text-white/50">
-                    Email
-                  </label>
-
-                  <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-xl focus-within:border-indigo-500/30 transition">
-                    <Mail className="h-5 w-5 text-indigo-300/60" />
-                    <input
-                      type="email"
-                      name="email"
-                      autoComplete="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="you@example.com"
-                      className="w-full bg-transparent outline-none text-white/90"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <input type="hidden" name="mode" value={mode} />
-
-                <div className="flex flex-col items-center justify-center gap-2 py-2">
-                  {turnstileEnabled ? (
-                    <>
-                      <Turnstile
-                        siteKey={turnstileSiteKey!}
-                        onSuccess={(token) => {
-                          setTurnstileToken(token);
-                          setTurnstileStatus("ready");
-                        }}
-                        onExpire={() => {
-                          setTurnstileToken("");
-                          setTurnstileStatus("loading");
-                        }}
-                        onError={() => {
-                          setTurnstileToken("");
-                          setTurnstileStatus("error");
-                        }}
-                        options={{
-                          appearance: "always",
-                          theme: "dark",
-                        }}
-                      />
-                      <p className="text-center text-sm text-white/60">
-                        {turnstileStatus === "loading" && "Waiting for verification challenge..."}
-                        {turnstileStatus === "ready" && (!turnstileToken ? "Verification challenge unavailable, continuing without it." : "Verification challenge complete.")}
-                        {turnstileStatus === "error" && "The verification challenge could not be completed. Please refresh and try again."}
-                      </p>
-                    </>
-                  ) : (
-                    <p className="text-center text-sm text-emerald-300/80">
-                      Verification challenge is not configured right now, so this step will continue without it.
-                    </p>
-                  )}
-                </div>
-
-                <button
-                  disabled={pending || !email.trim() || (mode === "register" && !username.trim())}
-                  className="group w-full rounded-2xl bg-indigo-500 py-4 font-semibold transition hover:bg-indigo-400 disabled:opacity-50"
-                >
-                  {pending ? "Sending..." : "Send Verification Code"}
-                  <ArrowRight className="ml-2 inline-block h-4 w-4 transition group-hover:translate-x-1" />
-                </button>
-              </form>
-            ) : (
-              /* CODE STEP */
-              <form key="codeForm" action={handleVerifyCode} autoComplete="off" className="space-y-5">
-
-                <input type="hidden" name="email" value={email} />
-                {mode === "register" && (
-                  <input type="hidden" name="username" value={username} />
-                )}
-
-                <div>
-                  <label className="mb-2 block text-sm text-white/50">
-                    Verification Code
-                  </label>
-
-                  <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-xl focus-within:border-indigo-500/30 transition">
-                    <Lock className="h-5 w-5 text-indigo-300/60" />
-                    <input
-                      type="text"
-                      name="verificationCode"
-                      autoComplete="one-time-code"
-                      inputMode="numeric"
-                      pattern="[0-9]*"
-                      maxLength={6}
-                      placeholder="123456"
-                      className="w-full bg-transparent text-2xl tracking-widest outline-none text-white/90"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <button
-                  disabled={pending}
-                  className="w-full rounded-2xl bg-indigo-500 py-4 font-semibold transition hover:bg-indigo-400 disabled:opacity-50"
-                >
-                  {pending ? "Verifying..." : "Verify & Continue"}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setStep("email")}
-                  className="flex w-full items-center justify-center gap-2 text-white/50 hover:text-white transition"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  Back
-                </button>
-              </form>
-            )}
-
-            {/* MESSAGE (SYSTEM STYLE) */}
-            {message && (
-              <div
-                className={`mt-8 rounded-2xl border p-4 text-sm backdrop-blur-xl ${
-                  message.type === "success"
-                    ? "border-green-500/20 bg-green-500/10 text-green-200"
-                    : "border-red-500/20 bg-red-500/10 text-red-200"
+      {/* Main Card */}
+      <div className="sm:mx-auto sm:w-full sm:max-w-md px-4">
+        <div className="bg-white py-8 px-6 sm:px-10 shadow-sm border border-zinc-200/80 rounded-2xl">
+          {/* Mode Switcher */}
+          {step === "email" && (
+            <div className="grid grid-cols-2 p-1 bg-zinc-100 rounded-xl mb-6 text-sm font-medium text-zinc-600">
+              <button
+                type="button"
+                onClick={() => { setMode("register"); setMessage(null); }}
+                className={`py-2 rounded-lg transition text-center ${
+                  mode === "register" ? "bg-white text-zinc-900 shadow-xs font-semibold" : "hover:text-zinc-900"
                 }`}
               >
-                {message.text}
-              </div>
-            )}
+                Create Account
+              </button>
+              <button
+                type="button"
+                onClick={() => { setMode("login"); setMessage(null); }}
+                className={`py-2 rounded-lg transition text-center ${
+                  mode === "login" ? "bg-white text-zinc-900 shadow-xs font-semibold" : "hover:text-zinc-900"
+                }`}
+              >
+                Sign In
+              </button>
+            </div>
+          )}
+
+          {/* Heading */}
+          <div className="mb-6">
+            <h2 className="text-xl font-bold tracking-tight text-zinc-900">
+              {step === "email"
+                ? mode === "register"
+                  ? "Start your learning journey"
+                  : "Welcome back"
+                : "Verify your email"}
+            </h2>
+            <p className="mt-1 text-sm text-zinc-500">
+              {step === "email"
+                ? mode === "register"
+                  ? "Build mastery with science-backed spaced repetition."
+                  : "Enter your email to continue your daily reviews."
+                : `We sent a 6-digit verification code to ${email}`}
+            </p>
           </div>
+
+          {/* Form Step: Email */}
+          {step === "email" ? (
+            <form key="emailForm" action={handleSendCode} className="space-y-4">
+              {mode === "register" && (
+                <div>
+                  <label className="block text-xs font-medium text-zinc-700 mb-1.5">
+                    Your Name / Username
+                  </label>
+                  <div className="relative rounded-xl border border-zinc-200 focus-within:border-indigo-600 focus-within:ring-2 focus-within:ring-indigo-100 transition">
+                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-zinc-400">
+                      <User className="h-4 w-4" />
+                    </div>
+                    <input
+                      name="username"
+                      type="text"
+                      autoComplete="name"
+                      required
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      placeholder="Jane Doe"
+                      className="block w-full rounded-xl py-2.5 pl-10 pr-3 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none"
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <label className="block text-xs font-medium text-zinc-700 mb-1.5">
+                  Email Address
+                </label>
+                <div className="relative rounded-xl border border-zinc-200 focus-within:border-indigo-600 focus-within:ring-2 focus-within:ring-indigo-100 transition">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-zinc-400">
+                    <Mail className="h-4 w-4" />
+                  </div>
+                  <input
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="jane@example.com"
+                    className="block w-full rounded-xl py-2.5 pl-10 pr-3 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <input type="hidden" name="mode" value={mode} />
+
+              {/* Turnstile Widget (Conditional) */}
+              {turnstileEnabled && (
+                <div className="pt-2 flex justify-center">
+                  <Turnstile
+                    siteKey={turnstileSiteKey!}
+                    onSuccess={(token) => {
+                      setTurnstileToken(token);
+                      setTurnstileStatus("ready");
+                    }}
+                    onExpire={() => {
+                      setTurnstileToken("");
+                      setTurnstileStatus("loading");
+                    }}
+                    onError={() => {
+                      setTurnstileToken("");
+                      setTurnstileStatus("error");
+                    }}
+                    options={{ appearance: "always", theme: "light" }}
+                  />
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={pending || !email.trim() || (mode === "register" && !username.trim())}
+                className="w-full mt-2 flex items-center justify-center gap-2 rounded-xl bg-indigo-600 py-2.5 px-4 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-50 transition cursor-pointer"
+              >
+                {pending ? "Sending code..." : "Send Verification Code"}
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            </form>
+          ) : (
+            /* Form Step: Code Verification */
+            <form key="codeForm" action={handleVerifyCode} className="space-y-4">
+              <input type="hidden" name="email" value={email} />
+              {mode === "register" && <input type="hidden" name="username" value={username} />}
+
+              <div>
+                <label className="block text-xs font-medium text-zinc-700 mb-1.5">
+                  6-Digit Verification Code
+                </label>
+                <div className="relative rounded-xl border border-zinc-200 focus-within:border-indigo-600 focus-within:ring-2 focus-within:ring-indigo-100 transition">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-zinc-400">
+                    <Lock className="h-4 w-4" />
+                  </div>
+                  <input
+                    name="verificationCode"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    maxLength={6}
+                    autoComplete="one-time-code"
+                    required
+                    autoFocus
+                    placeholder="123456"
+                    className="block w-full rounded-xl py-2.5 pl-10 pr-3 text-lg font-mono tracking-widest text-zinc-900 placeholder:text-zinc-300 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={pending}
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-indigo-600 py-2.5 px-4 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-50 transition cursor-pointer"
+              >
+                {pending ? "Verifying..." : "Verify & Continue"}
+                <CheckCircle2 className="h-4 w-4" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setStep("email")}
+                className="w-full text-center text-xs font-medium text-zinc-500 hover:text-zinc-900 transition pt-1 cursor-pointer"
+              >
+                ← Back to email
+              </button>
+            </form>
+          )}
+
+          {/* Feedback Message */}
+          {message && (
+            <div
+              className={`mt-4 rounded-xl p-3 text-xs leading-relaxed ${
+                message.type === "success"
+                  ? "bg-emerald-50 text-emerald-800 border border-emerald-200/60"
+                  : "bg-rose-50 text-rose-800 border border-rose-200/60"
+              }`}
+            >
+              {message.text}
+            </div>
+          )}
         </div>
+
+        {/* Value Prop Footer */}
+        <div className="mt-8 grid grid-cols-3 gap-2 text-center text-xs text-zinc-500">
+          <div className="flex flex-col items-center gap-1 p-2 rounded-lg bg-white/60 border border-zinc-200/40">
+            <Zap className="h-4 w-4 text-indigo-600" />
+            <span>Active Recall</span>
+          </div>
+          <div className="flex flex-col items-center gap-1 p-2 rounded-lg bg-white/60 border border-zinc-200/40">
+            <Brain className="h-4 w-4 text-indigo-600" />
+            <span>SM-2 Spaced SRS</span>
+          </div>
+          <div className="flex flex-col items-center gap-1 p-2 rounded-lg bg-white/60 border border-zinc-200/40">
+            <BookOpen className="h-4 w-4 text-indigo-600" />
+            <span>Skill Blueprint</span>
+          </div>
         </div>
       </div>
     </main>

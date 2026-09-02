@@ -1,40 +1,36 @@
-/*
- * Copyright (C) 2026 CODEXEDOC
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
-
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LogOut, Settings, Menu } from "lucide-react";
-import { motion } from "framer-motion";
+import {
+  LogOut,
+  Settings,
+  Plus,
+  Brain,
+  Sparkles,
+  Flame,
+  Layers,
+  CheckCircle2,
+  BookOpen,
+  Menu,
+  X,
+} from "lucide-react";
 
 import { TodayProgress } from "@/components/TodayProgress";
 import { SessionBreakdown } from "@/components/SessionBreakdown";
 import { CategoriesSection } from "@/components/CategoriesSection";
 import { ProgressAnalytics } from "@/components/ProgressAnalytics";
 import { SkillTree } from "@/components/SkillTree";
-import AddItemForm from "@/components/AddItemForm";
-
 import { StatsOverview } from "@/components/StatsOverview";
-import { LearningInsights } from "@/components/LearningInsights";
+import AddItemForm from "@/components/AddItemForm";
+import CreateCategoryModal from "@/components/CreateCategoryModal";
+import { StudySessionModal } from "@/components/StudySessionModal";
+import { CategoryDetailModal } from "@/components/CategoryDetailModal";
 
 import { getCurrentUser } from "@/lib/getCurrentUser";
+import { logoutAction } from "@/server/actions/auth/logout";
 import {
   fetchActiveGoal,
   fetchGoalCategories,
@@ -42,336 +38,358 @@ import {
   fetchProgressAnalytics,
   fetchStatistics,
   fetchSkillTree,
-  fetchLearningInsights,
 } from "@/server/actions/queryActions";
 
-interface TodayProgressStats {
-  reviewsDue: number;
-  newItems: number;
-  practiceTasks: number;
-  streak: number;
-}
-
-interface ProgressAnalyticsStats {
-  progressPercent: number;
-  itemsMastered: number;
-  retentionRate: number;
-  streak: number;
-}
-
-interface StatisticsStats {
-  totalItemsAdded: number;
-  itemsMastered: number;
-  reviewsCompleted: number;
-  minutesStudied: number;
-  averageSessionLength: number;
-  consecutiveDaysActive: number;
-}
-
-interface SkillTreeStats {
-  name: string;
-  percentage: number;
-  children?: Array<{
+interface DashboardData {
+  user: { id?: string; username?: string; email?: string } | null;
+  goal: { id?: string; title?: string; dailyMinutes?: number | null } | null;
+  categories: Array<{ id: string; name: string; itemCount: number }>;
+  todayStats: { reviewsDue: number; newItems: number; practiceTasks: number; streak: number };
+  progressStats: { progressPercent: number; itemsMastered: number; retentionRate: number; streak: number };
+  statistics: {
+    totalItemsAdded: number;
+    itemsMastered: number;
+    reviewsCompleted: number;
+    minutesStudied: number;
+    averageSessionLength: number;
+    consecutiveDaysActive: number;
+  };
+  skillTree: {
     name: string;
     percentage: number;
-    children?: Array<{ name: string; percentage: number }>;
-  }>;
-}
-
-interface LearningInsightsStats {
-  daysOfLearning: number;
-  hasEnoughData?: boolean;
-  bestStudyTime?: string;
-  bestSessionLength?: number;
-  highestRetentionDay?: string;
-  lowestRetentionDay?: string;
-  averageRecall?: number;
-  mostEffectiveMethod?: string;
-  leastEffectiveMethod?: string;
-}
-
-interface DashboardData {
-  user: { id?: string } | null;
-  goal: { id?: string; title?: string } | null;
-  categories: Array<{ id: string; name: string; itemCount: number }>;
-  todayStats: TodayProgressStats;
-  progressStats: ProgressAnalyticsStats;
-  statistics: StatisticsStats;
-  skillTree: SkillTreeStats;
-  insights: LearningInsightsStats;
+    children?: Array<{ name: string; percentage: number; children?: Array<{ name: string; percentage: number }> }>;
+  };
   loading: boolean;
 }
 
-const defaultTodayStats: TodayProgressStats = {
-  reviewsDue: 0,
-  newItems: 0,
-  practiceTasks: 0,
-  streak: 0,
-};
-
-const defaultProgressStats: ProgressAnalyticsStats = {
-  progressPercent: 0,
-  itemsMastered: 0,
-  retentionRate: 0,
-  streak: 0,
-};
-
-const defaultStatistics: StatisticsStats = {
-  totalItemsAdded: 0,
-  itemsMastered: 0,
-  reviewsCompleted: 0,
-  minutesStudied: 0,
-  averageSessionLength: 0,
-  consecutiveDaysActive: 0,
-};
-
-const defaultSkillTree: SkillTreeStats = {
-  name: "Overall Learning",
-  percentage: 0,
-  children: [],
-};
-
-const defaultInsights: LearningInsightsStats = {
-  daysOfLearning: 0,
-  hasEnoughData: false,
-};
-
 export default function DashboardPage() {
   const router = useRouter();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
+
+  // Modals state
   const [showAddItemModal, setShowAddItemModal] = useState(false);
+  const [showCreateCategoryModal, setShowCreateCategoryModal] = useState(false);
+  const [showStudyModal, setShowStudyModal] = useState(false);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+  const [selectedCategoryName, setSelectedCategoryName] = useState<string | undefined>(undefined);
+  const [activeCategoryDetailId, setActiveCategoryDetailId] = useState<string | null>(null);
+
   const [data, setData] = useState<DashboardData>({
     user: null,
     goal: null,
     categories: [],
-    todayStats: defaultTodayStats,
-    progressStats: defaultProgressStats,
-    statistics: defaultStatistics,
-    skillTree: defaultSkillTree,
-    insights: defaultInsights,
+    todayStats: { reviewsDue: 0, newItems: 0, practiceTasks: 0, streak: 0 },
+    progressStats: { progressPercent: 0, itemsMastered: 0, retentionRate: 0, streak: 0 },
+    statistics: {
+      totalItemsAdded: 0,
+      itemsMastered: 0,
+      reviewsCompleted: 0,
+      minutesStudied: 0,
+      averageSessionLength: 0,
+      consecutiveDaysActive: 0,
+    },
+    skillTree: { name: "Overall Learning", percentage: 0, children: [] },
     loading: true,
   });
 
-  // Load dashboard data on mount
-  useEffect(() => {
-    const loadDashboard = async () => {
-      try {
-        const user = await getCurrentUser();
-        const userId = user?.id;
+  const loadDashboard = async () => {
+    try {
+      const user = await getCurrentUser();
+      const userId = user?.id;
 
-        let goal: DashboardData["goal"] = null;
-        let todayStats: DashboardData["todayStats"] = defaultTodayStats;
-        let progressStats: DashboardData["progressStats"] = defaultProgressStats;
-        let statistics: DashboardData["statistics"] = defaultStatistics;
-        let skillTree: DashboardData["skillTree"] = defaultSkillTree;
-        let insights: DashboardData["insights"] = defaultInsights;
-        let categories: DashboardData["categories"] = [];
-
-        if (userId) {
-          [goal, todayStats, progressStats, statistics, skillTree, insights] =
-            await Promise.all([
-              fetchActiveGoal(userId),
-              fetchTodayProgress(userId, ""),
-              fetchProgressAnalytics(userId, ""),
-              fetchStatistics(userId),
-              fetchSkillTree(userId),
-              fetchLearningInsights(userId),
-            ]);
-
-          if (goal?.id) {
-            categories = await fetchGoalCategories(goal.id);
-          }
-        }
-
-        setData({
-          user,
-          goal,
-          categories,
-          todayStats,
-          progressStats,
-          statistics,
-          skillTree,
-          insights,
-          loading: false,
-        });
-      } catch (error) {
-        console.error("Error loading dashboard:", error);
-        setData((prev) => ({ ...prev, loading: false }));
+      if (!userId) {
+        router.replace("/auth");
+        return;
       }
-    };
 
+      const [goal, todayStats, progressStats, statistics, skillTree] = await Promise.all([
+        fetchActiveGoal(userId),
+        fetchTodayProgress(userId, ""),
+        fetchProgressAnalytics(userId, ""),
+        fetchStatistics(userId),
+        fetchSkillTree(userId),
+      ]);
+
+      let categories: DashboardData["categories"] = [];
+      if (goal?.id) {
+        categories = await fetchGoalCategories(goal.id);
+      }
+
+      setData({
+        user,
+        goal,
+        categories,
+        todayStats,
+        progressStats,
+        statistics,
+        skillTree,
+        loading: false,
+      });
+    } catch (error) {
+      console.error("Error loading dashboard:", error);
+      setData((prev) => ({ ...prev, loading: false }));
+    }
+  };
+
+  useEffect(() => {
     loadDashboard();
   }, []);
 
-  // Redirect to create page if no goal after loading
+  // Redirect to /create if user has no goal
   useEffect(() => {
     if (!data.loading && !data.goal) {
-      router.replace("/app/create");
+      router.replace("/create");
     }
   }, [data.loading, data.goal, router]);
 
+  const handleLogout = () => {
+    startTransition(async () => {
+      await logoutAction();
+    });
+  };
+
   if (data.loading) {
     return (
-      <main className="relative min-h-screen bg-[#050816] text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.25),transparent_40%)]" />
-        <div className="flex min-h-screen items-center justify-center">
-          <motion.div
-            animate={{ opacity: [0.5, 1, 0.5] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            <div className="text-center">
-              <div className="inline-block h-12 w-12 rounded-full border-4 border-indigo-500/30 border-t-indigo-500 animate-spin" />
-              <p className="mt-4 text-white/60">Loading your dashboard...</p>
-            </div>
-          </motion.div>
-        </div>
-      </main>
-    );
-  }
-
-  if (!data.goal) {
-    return (
-      <main className="relative min-h-screen bg-[#050816] text-white">
-        <div className="flex min-h-screen items-center justify-center">
-          <p className="text-white/60">Redirecting to goal creation...</p>
+      <main className="min-h-screen bg-[#fafafa] flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block h-8 w-8 rounded-full border-2 border-indigo-600/20 border-t-indigo-600 animate-spin" />
+          <p className="mt-3 text-sm text-zinc-500 font-medium">Loading your learning workspace...</p>
         </div>
       </main>
     );
   }
 
   return (
-    <main className="relative min-h-screen bg-[#050816] text-white">
-      {/* Background Effects */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.25),transparent_40%)]" />
-      <div className="absolute left-1/2 top-0 h-150 w-150 -translate-x-1/2 rounded-full bg-cyan-500/10 blur-[140px]" />
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[70px_70px]" />
+    <main className="min-h-screen bg-[#fafafa] text-zinc-900 pb-16">
+      {/* Top Navbar */}
+      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-zinc-200/80">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
+          {/* Brand & Goal Pill */}
+          <div className="flex items-center gap-4 min-w-0">
+            <Link href="/app" className="flex items-center gap-2.5 flex-shrink-0">
+              <div className="h-8 w-8 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-xs shadow-indigo-200">
+                <Brain className="h-4 w-4" />
+              </div>
+              <span className="text-sm font-bold tracking-tight text-zinc-900 hidden sm:inline">CODEXEDOC</span>
+            </Link>
 
-      {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-white/10 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 sm:h-20 max-w-7xl items-center justify-between px-3 sm:px-6">
-          <Link href="/" className="flex items-center gap-2 sm:gap-3">
-            <div className="relative h-9 w-9 sm:h-10 sm:w-10 overflow-hidden rounded-lg sm:rounded-xl border border-white/10 bg-white/5">
-              <Image
-                src="/codexedoc.png"
-                alt="CODEXEDOC Logo"
-                fill
-                className="object-cover"
-              />
-            </div>
-            <div>
-              <h1 className="text-xs sm:text-sm font-black tracking-wide">CODEXEDOC</h1>
-            </div>
-          </Link>
+            {data.goal && (
+              <div className="h-4 w-px bg-zinc-200 hidden sm:block" />
+            )}
 
-          {/* Goal Display */}
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="hidden lg:flex items-center gap-4"
-          >
-            <div className="text-right">
-              <p className="text-xs text-white/50">Current Goal</p>
-              <p className="text-lg font-black truncate">{data.goal?.title}</p>
-            </div>
-          </motion.div>
+            {data.goal && (
+              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200/60 text-xs font-semibold text-zinc-800 max-w-[200px] sm:max-w-xs truncate">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 flex-shrink-0" />
+                <span className="truncate">{data.goal.title}</span>
+              </div>
+            )}
+          </div>
 
-          {/* Actions */}
-          <div className="flex items-center gap-2 sm:gap-4">
-            <button className="hidden sm:flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 rounded-lg sm:rounded-xl border border-white/10 bg-white/5 text-white/60 hover:text-white hover:bg-white/10 transition">
-              <Settings className="h-4 w-4 sm:h-5 sm:w-5" />
-            </button>
-
-            <button className="hidden sm:flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 rounded-lg sm:rounded-xl border border-white/10 bg-white/5 text-white/60 hover:text-white hover:bg-white/10 transition">
-              <LogOut className="h-4 w-4 sm:h-5 sm:w-5" />
+          {/* Nav Actions */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            <button
+              onClick={() => {
+                setSelectedCategoryId(null);
+                setSelectedCategoryName(undefined);
+                setShowStudyModal(true);
+              }}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-500 shadow-xs transition cursor-pointer"
+            >
+              <Brain className="h-3.5 w-3.5" />
+              <span>Review ({data.todayStats.reviewsDue})</span>
             </button>
 
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden flex items-center justify-center h-9 w-9 rounded-lg border border-white/10 bg-white/5 text-white/60 hover:text-white hover:bg-white/10 transition"
+              onClick={() => setShowAddItemModal(true)}
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-zinc-200 bg-white text-zinc-700 text-xs font-semibold hover:bg-zinc-50 transition cursor-pointer"
             >
-              <Menu className="h-4 w-4" />
+              <Plus className="h-3.5 w-3.5" />
+              <span>Add Card</span>
+            </button>
+
+            <div className="h-4 w-px bg-zinc-200" />
+
+            {/* Logout button */}
+            <button
+              onClick={handleLogout}
+              disabled={isPending}
+              className="p-2 rounded-xl text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 transition cursor-pointer"
+              title="Sign Out"
+            >
+              <LogOut className="h-4 w-4" />
             </button>
           </div>
         </div>
       </header>
 
-      {/* Content */}
-      <div className="relative z-10">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-12">
-          {/* Welcome Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-8 sm:mb-12"
-          >
-            <h2 className="text-2xl font-black sm:text-3xl lg:text-4xl truncate">{data.goal?.title}</h2>
-            <p className="mt-1 sm:mt-2 text-sm sm:text-base text-white/60">
-              Track your progress, organize your learning blueprint, and master your goal systematically.
-            </p>
-          </motion.div>
-
-          {/* Main Grid */}
-          <div className="grid gap-6 sm:gap-8 lg:gap-12 lg:grid-cols-4">
-            {/* Left Column - Main Content */}
-            <div className="lg:col-span-2 space-y-6 sm:space-y-8 lg:space-y-12">
-              <TodayProgress {...data.todayStats} />
-              <SessionBreakdown />
-              <CategoriesSection
-                categories={data.categories}
-                onCreateCategory={() => console.log("Create category")}
-              />
-              <SkillTree />
+      {/* Main Container */}
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 pt-8">
+        {/* Goal Hero Banner */}
+        <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-2xl bg-white border border-zinc-200/80 shadow-xs">
+          <div>
+            <div className="flex items-center gap-2 text-xs font-medium text-zinc-500 mb-1">
+              <span>Active Learning Goal</span>
+              <span>•</span>
+              <span className="text-indigo-600 font-semibold">{data.goal?.dailyMinutes || 30} mins daily</span>
             </div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900">
+              {data.goal?.title}
+            </h1>
+          </div>
 
-            {/* Right Sidebar */}
-            <div className="lg:col-span-2 space-y-4 sm:space-y-6">
-              <ProgressAnalytics {...data.progressStats} />
-              <StatsOverview {...data.statistics} />
-              <LearningInsights {...data.insights} />
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => router.push(`/create?userId=${data.user?.id || ""}`)}
+              className="px-3.5 py-2 rounded-xl border border-zinc-200 bg-zinc-50 text-zinc-700 text-xs font-semibold hover:bg-zinc-100 transition cursor-pointer"
+            >
+              Change Goal
+            </button>
+            <button
+              onClick={() => setShowCreateCategoryModal(true)}
+              className="px-3.5 py-2 rounded-xl bg-zinc-900 text-white text-xs font-semibold hover:bg-zinc-800 transition cursor-pointer shadow-xs"
+            >
+              + New Topic
+            </button>
+          </div>
+        </div>
 
-              {/* Quick Stats */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="rounded-2xl sm:rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-6 backdrop-blur-xl space-y-3 sm:space-y-4"
+        {/* Dashboard Grid */}
+        <div className="grid gap-8 lg:grid-cols-3">
+          {/* Left Column (2 Cols) - Study & Topics */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Daily Queue */}
+            <TodayProgress
+              {...data.todayStats}
+              onStartReview={() => setShowStudyModal(true)}
+            />
+
+            {/* Daily Focus Block */}
+            <SessionBreakdown
+              dailyMinutes={data.goal?.dailyMinutes || 30}
+              onStartSession={() => {
+                setSelectedCategoryId(null);
+                setSelectedCategoryName(undefined);
+                setShowStudyModal(true);
+              }}
+            />
+
+            {/* Blueprint Topics */}
+            <CategoriesSection
+              categories={data.categories}
+              onCreateCategory={() => setShowCreateCategoryModal(true)}
+              onSelectCategory={(catId) => setActiveCategoryDetailId(catId)}
+            />
+
+            {/* Dynamic Skill Tree */}
+            <SkillTree treeData={data.skillTree} />
+          </div>
+
+          {/* Right Column (1 Col) - Analytics & Quick Controls */}
+          <div className="space-y-6">
+            {/* Quick Actions Card */}
+            <div className="p-5 rounded-2xl border border-zinc-200/80 bg-white shadow-xs space-y-3">
+              <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Quick Actions</p>
+
+              <button
+                onClick={() => {
+                  setSelectedCategoryId(null);
+                  setSelectedCategoryName(undefined);
+                  setShowStudyModal(true);
+                }}
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-500 transition cursor-pointer shadow-xs"
               >
-                <p className="text-xs sm:text-sm text-white/50">Quick Actions</p>
+                <Brain className="h-4 w-4" />
+                Start Flashcard Session
+              </button>
 
-                <button
-                  onClick={() => setShowAddItemModal(true)}
-                  className="w-full rounded-2xl bg-indigo-500 py-2.5 sm:py-3 text-sm sm:text-base font-semibold hover:bg-indigo-400 transition"
-                >
-                  Add Knowledge
-                </button>
+              <button
+                onClick={() => setShowAddItemModal(true)}
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-zinc-200 bg-white text-zinc-800 font-semibold text-sm hover:bg-zinc-50 transition cursor-pointer"
+              >
+                <Plus className="h-4 w-4" />
+                Add Knowledge Card
+              </button>
 
-                {showAddItemModal && (
-                  <AddItemForm
-                    userId={data.user?.id}
-                    categories={data.categories}
-                    onClose={() => setShowAddItemModal(false)}
-                    onCreated={() => {
-                      setShowAddItemModal(false);
-                      router.refresh();
-                    }}
-                  />
-                )}
-
-                <button className="w-full rounded-2xl border border-white/10 bg-white/5 py-2.5 sm:py-3 text-sm sm:text-base font-semibold hover:bg-white/10 transition">
-                  View Stats
-                </button>
-
-                <button
-                  onClick={() => router.push(`/app/create?userId=${data.user?.id || ""}`)}
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 py-2.5 sm:py-3 text-sm sm:text-base font-semibold hover:bg-white/10 transition"
-                >
-                  New Goal
-                </button>
-              </motion.div>
+              <button
+                onClick={() => setShowCreateCategoryModal(true)}
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-zinc-200 bg-white text-zinc-800 font-semibold text-sm hover:bg-zinc-50 transition cursor-pointer"
+              >
+                <Layers className="h-4 w-4" />
+                Add Topic / Module
+              </button>
             </div>
+
+            {/* Progress & Retention */}
+            <ProgressAnalytics {...data.progressStats} />
+
+            {/* Lifetime Stats */}
+            <StatsOverview {...data.statistics} />
           </div>
         </div>
       </div>
+
+      {/* Modals */}
+      {showStudyModal && data.user?.id && (
+        <StudySessionModal
+          userId={data.user.id}
+          categoryId={selectedCategoryId || undefined}
+          categoryName={selectedCategoryName}
+          onClose={() => setShowStudyModal(false)}
+          onComplete={() => {
+            setShowStudyModal(false);
+            loadDashboard();
+          }}
+        />
+      )}
+
+      {activeCategoryDetailId && (
+        <CategoryDetailModal
+          categoryId={activeCategoryDetailId}
+          onClose={() => setActiveCategoryDetailId(null)}
+          onAddItem={(catId) => {
+            setSelectedCategoryId(catId);
+            setShowAddItemModal(true);
+          }}
+          onStartCategoryPractice={(catId, catName) => {
+            setActiveCategoryDetailId(null);
+            setSelectedCategoryId(catId);
+            setSelectedCategoryName(catName);
+            setShowStudyModal(true);
+          }}
+          onCategoryDeleted={() => {
+            setActiveCategoryDetailId(null);
+            loadDashboard();
+          }}
+        />
+      )}
+
+      {showAddItemModal && (
+        <AddItemForm
+          userId={data.user?.id}
+          categories={data.categories}
+          initialCategoryId={selectedCategoryId || undefined}
+          onClose={() => {
+            setShowAddItemModal(false);
+            setSelectedCategoryId(null);
+          }}
+          onCreated={() => {
+            setShowAddItemModal(false);
+            setSelectedCategoryId(null);
+            loadDashboard();
+          }}
+        />
+      )}
+
+      {showCreateCategoryModal && data.goal?.id && (
+        <CreateCategoryModal
+          goalId={data.goal.id}
+          onClose={() => setShowCreateCategoryModal(false)}
+          onCreated={() => {
+            setShowCreateCategoryModal(false);
+            loadDashboard();
+          }}
+        />
+      )}
     </main>
   );
 }

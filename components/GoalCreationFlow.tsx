@@ -2,8 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, ArrowLeft, Sparkles } from "lucide-react";
-import { createGoalAction } from "@/server/mutations/appMutations";
+import { ArrowRight, ArrowLeft, Sparkles, Target, Clock, Calendar, Compass, Check } from "lucide-react";
+import { createGoalAction, createLearningAreaAction } from "@/server/mutations/appMutations";
 
 type Step = "title" | "why" | "timeline" | "time";
 
@@ -13,6 +13,14 @@ interface GoalCreationFlowProps {
   userId: string;
 }
 
+const PRESET_GOALS = [
+  "Master React & TypeScript",
+  "Conversational Spanish",
+  "System Design & Architecture",
+  "AWS Cloud Practitioner",
+  "Data Structures & Algorithms",
+];
+
 export function GoalCreationFlow({ onClose, onGoalCreated, userId }: GoalCreationFlowProps) {
   const [step, setStep] = useState<Step>("title");
   const [pending, startTransition] = useTransition();
@@ -21,33 +29,28 @@ export function GoalCreationFlow({ onClose, onGoalCreated, userId }: GoalCreatio
     title: "",
     why: "",
     timeline: "",
-    dailyMinutes: "",
+    dailyMinutes: "30",
   });
 
+  const steps: Step[] = ["title", "why", "timeline", "time"];
+  const currentStepIndex = steps.indexOf(step);
+
   const handleNext = () => {
-    const steps: Step[] = ["title", "why", "timeline", "time"];
-    const currentIndex = steps.indexOf(step);
-    if (currentIndex < steps.length - 1) {
-      setStep(steps[currentIndex + 1]);
+    if (currentStepIndex < steps.length - 1) {
+      setStep(steps[currentStepIndex + 1]);
     }
   };
 
   const handleBack = () => {
-    const steps: Step[] = ["title", "why", "timeline", "time"];
-    const currentIndex = steps.indexOf(step);
-    if (currentIndex > 0) {
-      setStep(steps[currentIndex - 1]);
+    if (currentStepIndex > 0) {
+      setStep(steps[currentStepIndex - 1]);
     }
   };
 
   const handleCreate = async () => {
     startTransition(async () => {
       try {
-        // Require userId to be present. If missing, abort create and log error.
-        if (!userId) {
-          console.error("GoalCreationFlow: missing userId; cannot create goal.");
-          return;
-        }
+        if (!userId) return;
 
         const result = await createGoalAction(userId, {
           title: formData.title,
@@ -66,185 +69,222 @@ export function GoalCreationFlow({ onClose, onGoalCreated, userId }: GoalCreatio
     });
   };
 
-  const whyOptions = ["Travel", "Career", "School", "Hobby", "Other"];
-  const timelineOptions = ["No deadline", "3 months", "6 months", "1 year"];
-  const dailyTimeOptions = ["15 minutes", "30 minutes", "1 hour", "2+ hours"];
+  const whyOptions = [
+    { label: "Career Advancement", desc: "For new jobs, promotions, or interview prep" },
+    { label: "Personal Curiosity", desc: "Exploring a new skill or fascinating topic" },
+    { label: "School / Exam", desc: "Passing an exam or academic course" },
+    { label: "Travel & Practical Use", desc: "Applying it in real world day-to-day situations" },
+  ];
+
+  const timelineOptions = [
+    { label: "1 Month", desc: "High intensity sprint" },
+    { label: "3 Months", desc: "Consistent focused learning" },
+    { label: "6 Months", desc: "Deep mastery over time" },
+    { label: "No Deadline", desc: "Self-paced continuous learning" },
+  ];
+
+  const dailyTimeOptions = [
+    { label: "15 minutes", desc: "Quick daily habit" },
+    { label: "30 minutes", desc: "Recommended balance" },
+    { label: "45 minutes", desc: "Accelerated pace" },
+    { label: "60+ minutes", desc: "Intense daily focus" },
+  ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
-        className="relative w-full max-w-2xl rounded-[40px] border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl"
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-white/10 p-8">
-          <div>
-            <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-indigo-500/20 bg-indigo-500/10 px-4 py-1 text-sm text-indigo-200">
-              <Sparkles className="h-3 w-3" />
-              Create Your Learning Goal
-            </div>
-            <h2 className="text-3xl font-black">
-              {step === "title" && "What would you like to learn?"}
-              {step === "why" && "Why are you learning this?"}
-              {step === "timeline" && "When would you like to reach this goal?"}
-              {step === "time" && "How much time can you study daily?"}
-            </h2>
-          </div>
+    <div className="w-full max-w-2xl bg-white border border-zinc-200/80 rounded-2xl shadow-sm p-6 sm:p-10">
+      {/* Step Progress Header */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between text-xs font-semibold text-zinc-400 mb-2">
+          <span className="uppercase tracking-wider">Step {currentStepIndex + 1} of 4</span>
+          <span>{Math.round(((currentStepIndex + 1) / 4) * 100)}%</span>
+        </div>
+        <div className="h-1.5 w-full bg-zinc-100 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-indigo-600 transition-all duration-300 rounded-full"
+            style={{ width: `${((currentStepIndex + 1) / 4) * 100}%` }}
+          />
+        </div>
+      </div>
 
-          {onClose && (
-            <button
-              onClick={onClose}
-              className="text-white/50 hover:text-white transition"
+      {/* Step Heading */}
+      <div className="mb-6">
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-xs font-medium text-indigo-700 mb-3">
+          <Sparkles className="h-3.5 w-3.5" />
+          <span>Goal Blueprint Setup</span>
+        </div>
+        <h2 className="text-2xl font-bold tracking-tight text-zinc-900">
+          {step === "title" && "What do you want to learn?"}
+          {step === "why" && "What is your main motivation?"}
+          {step === "timeline" && "What is your target timeline?"}
+          {step === "time" && "How much time can you commit daily?"}
+        </h2>
+        <p className="mt-1 text-sm text-zinc-500">
+          {step === "title" && "Define your primary learning goal. You can add topics and flashcards inside it."}
+          {step === "why" && "Understanding your motivation helps calibrate review schedules."}
+          {step === "timeline" && "Set a target date to organize your spaced repetition cadence."}
+          {step === "time" && "Daily consistency is key to long-term memory consolidation."}
+        </p>
+      </div>
+
+      {/* Step Content */}
+      <div className="min-h-[240px]">
+        <AnimatePresence mode="wait">
+          {/* Step 1: Goal Title */}
+          {step === "title" && (
+            <motion.div
+              key="title"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              className="space-y-4"
             >
-              ✕
-            </button>
+              <input
+                type="text"
+                placeholder="e.g. Master React & TypeScript, Conversational Spanish..."
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                className="w-full rounded-xl border border-zinc-300 px-4 py-3 text-base text-zinc-900 placeholder:text-zinc-400 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition"
+                autoFocus
+              />
+
+              <div>
+                <p className="text-xs font-medium text-zinc-500 mb-2">Popular suggestions:</p>
+                <div className="flex flex-wrap gap-2">
+                  {PRESET_GOALS.map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, title: preset })}
+                      className="text-xs px-3 py-1.5 rounded-lg border border-zinc-200 bg-zinc-50 text-zinc-700 hover:bg-zinc-100 hover:border-zinc-300 transition cursor-pointer"
+                    >
+                      {preset}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
           )}
-        </div>
 
-        {/* Content */}
-        <div className="p-8">
-          <AnimatePresence mode="wait">
-            {/* Step 1: Title */}
-            {step === "title" && (
-              <motion.div
-                key="title"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="space-y-6"
-              >
-                <input
-                  type="text"
-                  placeholder="e.g., Learn Mandarin Chinese, Master React, Pass Security+ Exam"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-lg text-white placeholder-white/40 focus:border-indigo-500/30 focus:outline-none transition"
-                  autoFocus
-                />
-                <p className="text-sm text-white/60">
-                  Be specific and clear about your learning goal. This will guide your entire learning system.
-                </p>
-              </motion.div>
-            )}
+          {/* Step 2: Motivation */}
+          {step === "why" && (
+            <motion.div
+              key="why"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              className="grid gap-3 sm:grid-cols-2"
+            >
+              {whyOptions.map((option) => (
+                <button
+                  key={option.label}
+                  type="button"
+                  onClick={() => setFormData({ ...formData, why: option.label })}
+                  className={`p-4 rounded-xl border text-left transition cursor-pointer ${
+                    formData.why === option.label
+                      ? "border-indigo-600 bg-indigo-50/50 ring-1 ring-indigo-600"
+                      : "border-zinc-200 bg-white hover:border-zinc-300 hover:bg-zinc-50"
+                  }`}
+                >
+                  <p className="font-semibold text-sm text-zinc-900">{option.label}</p>
+                  <p className="text-xs text-zinc-500 mt-1">{option.desc}</p>
+                </button>
+              ))}
+            </motion.div>
+          )}
 
-            {/* Step 2: Why */}
-            {step === "why" && (
-              <motion.div
-                key="why"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="grid gap-3 sm:grid-cols-2"
-              >
-                {whyOptions.map((option) => (
-                  <button
-                    key={option}
-                    onClick={() => setFormData({ ...formData, why: option })}
-                    className={`rounded-2xl border-2 p-4 text-left font-semibold transition ${
-                      formData.why === option
-                        ? "border-indigo-500 bg-indigo-500/20 text-white"
-                        : "border-white/10 bg-white/5 text-white/70 hover:border-white/30 hover:bg-white/10"
-                    }`}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </motion.div>
-            )}
+          {/* Step 3: Timeline */}
+          {step === "timeline" && (
+            <motion.div
+              key="timeline"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              className="grid gap-3 sm:grid-cols-2"
+            >
+              {timelineOptions.map((option) => (
+                <button
+                  key={option.label}
+                  type="button"
+                  onClick={() => setFormData({ ...formData, timeline: option.label })}
+                  className={`p-4 rounded-xl border text-left transition cursor-pointer ${
+                    formData.timeline === option.label
+                      ? "border-indigo-600 bg-indigo-50/50 ring-1 ring-indigo-600"
+                      : "border-zinc-200 bg-white hover:border-zinc-300 hover:bg-zinc-50"
+                  }`}
+                >
+                  <p className="font-semibold text-sm text-zinc-900">{option.label}</p>
+                  <p className="text-xs text-zinc-500 mt-1">{option.desc}</p>
+                </button>
+              ))}
+            </motion.div>
+          )}
 
-            {/* Step 3: Timeline */}
-            {step === "timeline" && (
-              <motion.div
-                key="timeline"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="grid gap-3 sm:grid-cols-2"
-              >
-                {timelineOptions.map((option) => (
-                  <button
-                    key={option}
-                    onClick={() => setFormData({ ...formData, timeline: option })}
-                    className={`rounded-2xl border-2 p-4 text-left font-semibold transition ${
-                      formData.timeline === option
-                        ? "border-indigo-500 bg-indigo-500/20 text-white"
-                        : "border-white/10 bg-white/5 text-white/70 hover:border-white/30 hover:bg-white/10"
-                    }`}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </motion.div>
-            )}
+          {/* Step 4: Daily Minutes */}
+          {step === "time" && (
+            <motion.div
+              key="time"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              className="grid gap-3 sm:grid-cols-2"
+            >
+              {dailyTimeOptions.map((option) => (
+                <button
+                  key={option.label}
+                  type="button"
+                  onClick={() => setFormData({ ...formData, dailyMinutes: option.label })}
+                  className={`p-4 rounded-xl border text-left transition cursor-pointer ${
+                    formData.dailyMinutes === option.label
+                      ? "border-indigo-600 bg-indigo-50/50 ring-1 ring-indigo-600"
+                      : "border-zinc-200 bg-white hover:border-zinc-300 hover:bg-zinc-50"
+                  }`}
+                >
+                  <p className="font-semibold text-sm text-zinc-900">{option.label}</p>
+                  <p className="text-xs text-zinc-500 mt-1">{option.desc}</p>
+                </button>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
-            {/* Step 4: Daily Time */}
-            {step === "time" && (
-              <motion.div
-                key="time"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="grid gap-3 sm:grid-cols-2"
-              >
-                {dailyTimeOptions.map((option) => (
-                  <button
-                    key={option}
-                    onClick={() => setFormData({ ...formData, dailyMinutes: option })}
-                    className={`rounded-2xl border-2 p-4 text-left font-semibold transition ${
-                      formData.dailyMinutes === option
-                        ? "border-indigo-500 bg-indigo-500/20 text-white"
-                        : "border-white/10 bg-white/5 text-white/70 hover:border-white/30 hover:bg-white/10"
-                    }`}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+      {/* Footer Navigation */}
+      <div className="mt-8 pt-6 border-t border-zinc-100 flex items-center justify-between">
+        <button
+          type="button"
+          onClick={step === "title" ? onClose : handleBack}
+          className="flex items-center gap-1.5 text-sm font-medium text-zinc-500 hover:text-zinc-900 transition cursor-pointer"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          {step === "title" ? "Cancel" : "Back"}
+        </button>
 
-        {/* Footer / Actions */}
-        <div className="flex items-center justify-between border-t border-white/10 p-8">
+        {step !== "time" ? (
           <button
-            onClick={step === "title" ? onClose : handleBack}
-            className="flex items-center gap-2 text-white/60 hover:text-white transition"
+            type="button"
+            onClick={handleNext}
+            disabled={
+              (step === "title" && !formData.title.trim()) ||
+              (step === "why" && !formData.why) ||
+              (step === "timeline" && !formData.timeline)
+            }
+            className="flex items-center gap-1.5 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 disabled:opacity-40 transition cursor-pointer"
           >
-            <ArrowLeft className="h-4 w-4" />
-            {step === "title" ? "Cancel" : "Back"}
+            Next
+            <ArrowRight className="h-4 w-4" />
           </button>
-
-          <div className="flex gap-3">
-            {step !== "time" && (
-              <button
-                onClick={handleNext}
-                disabled={
-                  (step === "title" && !formData.title) ||
-                  (step === "why" && !formData.why) ||
-                  (step === "timeline" && !formData.timeline)
-                }
-                className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-6 py-3 font-semibold text-white hover:border-white/30 hover:bg-white/10 transition disabled:opacity-50"
-              >
-                Next
-                <ArrowRight className="h-4 w-4" />
-              </button>
-            )}
-
-            {step === "time" && (
-              <button
-                onClick={handleCreate}
-                disabled={!formData.dailyMinutes || pending}
-                className="flex items-center gap-2 rounded-2xl bg-indigo-500 px-8 py-3 font-semibold text-white hover:bg-indigo-400 transition disabled:opacity-50"
-              >
-                {pending ? "Creating..." : "Create Goal"}
-                <Sparkles className="h-4 w-4" />
-              </button>
-            )}
-          </div>
-        </div>
-      </motion.div>
+        ) : (
+          <button
+            type="button"
+            onClick={handleCreate}
+            disabled={pending || !formData.dailyMinutes}
+            className="flex items-center gap-1.5 rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 disabled:opacity-40 transition cursor-pointer"
+          >
+            {pending ? "Creating Goal..." : "Finish & Open Dashboard"}
+            <Check className="h-4 w-4" />
+          </button>
+        )}
+      </div>
     </div>
   );
 }

@@ -1,7 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Target, BarChart3, Flame } from "lucide-react";
+import { Target, BarChart3, TrendingUp, CheckCircle2 } from "lucide-react";
 
 interface ProgressAnalyticsProps {
   progressPercent: number;
@@ -16,69 +15,38 @@ export function ProgressAnalytics({
   retentionRate,
   streak,
 }: ProgressAnalyticsProps) {
-  const stats = [
-    { label: "Overall Progress", value: `${progressPercent}%`, icon: BarChart3 },
-    { label: "Items Mastered", value: itemsMastered.toString(), icon: Target },
-    { label: "Retention Rate", value: `${retentionRate}%`, icon: BarChart3 },
-  ];
-
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.1 }}
-      className="space-y-4 sm:space-y-6"
-    >
-      {/* Header */}
-      <div>
-        <p className="text-sm text-white/50">Your Progress</p>
-        <h3 className="mt-1 text-2xl font-black">Learning Analytics</h3>
+    <div className="rounded-2xl border border-zinc-200/80 bg-white p-5 sm:p-6 shadow-xs space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-bold text-zinc-900">Retention & Analytics</h3>
+        <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+          {retentionRate}% Accuracy
+        </span>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        {stats.map((stat, index) => {
-          const Icon = stat.icon;
-          return (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2 + index * 0.08 }}
-              className="rounded-2xl sm:rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-6 backdrop-blur-xl hover:border-indigo-500/30 hover:bg-white/8 transition"
-            >
-              <div className="flex items-center justify-between gap-2">
-                <div>
-                  <p className="text-xs sm:text-sm text-white/50">{stat.label}</p>
-                  <h4 className="mt-2 sm:mt-3 text-2xl sm:text-3xl font-black">{stat.value}</h4>
-                </div>
-                <Icon className="h-8 w-8 text-indigo-300/40" />
-              </div>
-            </motion.div>
-          );
-        })}
-      </div>
-
-      {/* Progress Bar */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.4 }}
-        className="rounded-2xl sm:rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-6 backdrop-blur-xl"
-      >
-        <div className="flex items-center justify-between mb-4">
-          <h4 className="font-semibold">Learning Journey</h4>
-          <span className="text-lg font-black">{progressPercent}%</span>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-100">
+          <span className="text-xs text-zinc-500 font-medium">Items Mastered</span>
+          <p className="text-xl font-bold text-zinc-900 mt-1">{itemsMastered}</p>
         </div>
-        <div className="h-3 overflow-hidden rounded-full bg-white/5">
-          <motion.div
-            initial={{ width: 0 }}
-            animate={{ width: `${progressPercent}%` }}
-            transition={{ duration: 1, delay: 0.5 }}
-            className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-cyan-400"
+        <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-100">
+          <span className="text-xs text-zinc-500 font-medium">Goal Progress</span>
+          <p className="text-xl font-bold text-zinc-900 mt-1">{progressPercent}%</p>
+        </div>
+      </div>
+
+      <div>
+        <div className="flex justify-between text-xs text-zinc-500 mb-1">
+          <span>Overall Retention Target</span>
+          <span>85% Target</span>
+        </div>
+        <div className="h-1.5 w-full bg-zinc-100 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-emerald-500 rounded-full transition-all"
+            style={{ width: `${Math.min(100, (retentionRate / 85) * 100)}%` }}
           />
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }

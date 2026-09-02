@@ -273,7 +273,7 @@ export async function getStatistics(userId: string) {
   }
 }
 
-// Build skill tree from items
+// Build dynamic skill tree from actual categories and items
 export async function getSkillTree(userId: string) {
   if (!isValidUUID(userId)) {
     return {
@@ -287,36 +287,51 @@ export async function getSkillTree(userId: string) {
       where: eq(items.userId, userId),
     });
 
-    // Group items by type to create skill tree structure
-    const skillTree = {
-      name: "Overall Learning",
-      percentage: calculateMasteryPercentage(allItems),
-      children: [
-        {
-          name: "Speaking",
-          percentage: calculateTypePercentage(allItems, ["vocab"]),
-          children: [
-            { name: "Introductions", percentage: 100 },
-            { name: "Questions", percentage: 75 },
-            { name: "Opinions", percentage: 20 },
-          ],
-        },
-        {
-          name: "Listening",
-          percentage: calculateTypePercentage(allItems, ["concept"]),
-        },
-        {
-          name: "Reading",
-          percentage: calculateTypePercentage(allItems, ["fact"]),
-        },
-        {
-          name: "Writing",
-          percentage: calculateTypePercentage(allItems, ["procedure"]),
-        },
+    const activeGoal = await getActiveGoal(userId);
+    const goalCategories = activeGoal ? await db.query.learningAreas.findMany({
+      where: eq(learningAreas.goalId, activeGoal.id),
+    }) : [];
+
+    // Calculate total mastery percentage (weighted: mastered=100%, strong=75%, familiar=50%, learning=25%)
+    let totalScore = 0;
+    for (const item of allItems) {
+      if (item.masteryLevel === "mastered") totalScore += 100;
+      else if (item.masteryLevel === "strong") totalScore += 75;
+      else if (item.masteryLevel === "familiar") totalScore += 50;
+      else if (item.masteryLevel === "learning") totalScore += 25;
+    }
+    const overallPercentage = allItems.length > 0 ? Math.round(totalScore / allItems.length) : 0;
+
+    const children = goalCategories.map((cat) => {
+      const catItems = allItems.filter((i) => i.areaId === cat.id);
+      let catScore = 0;
+      for (const item of catItems) {
+        if (item.masteryLevel === "mastered") catScore += 100;
+        else if (item.masteryLevel === "strong") catScore += 75;
+        else if (item.masteryLevel === "familiar") catScore += 50;
+        else if (item.masteryLevel === "learning") catScore += 25;
+      }
+      const catPercentage = catItems.length > 0 ? Math.round(catScore / catItems.length) : 0;
+
+      return {
+        name: cat.name,
+        percentage: catPercentage,
+        children: [
+          {
+            name: `${catItems.filter(i => i.masteryLevel === "mastered" || i.masteryLevel === "strong").length} / ${catItems.length} Mastered`,
+            percentage: catPercentage,
+          }
+        ]
+      };
+    });
+
+    return {
+      name: activeGoal?.title || "Overall Learning",
+      percentage: overallPercentage,
+      children: children.length > 0 ? children : [
+        { name: "Create your first category to build your skill tree", percentage: 0 }
       ],
     };
-
-    return skillTree;
   } catch (error) {
     console.error("Error building skill tree:", error);
     return {
@@ -325,22 +340,6 @@ export async function getSkillTree(userId: string) {
       children: [],
     };
   }
-}
-
-type ItemRecord = InferSelectModel<typeof items>;
-
-// Helper functions
-export function calculateMasteryPercentage(items: ItemRecord[]): number {
-  if (items.length === 0) return 0;
-  const masteredCount = items.filter((item) => item.masteryLevel === "mastered").length;
-  return Math.round((masteredCount / items.length) * 100);
-}
-
-export function calculateTypePercentage(items: ItemRecord[], types: string[]): number {
-  const filtered = items.filter((item) => types.includes(item.type));
-  if (filtered.length === 0) return 0;
-  const masteredCount = filtered.filter((item) => item.masteryLevel === "mastered").length;
-  return Math.round((masteredCount / filtered.length) * 100);
 }
 
 // Get learning insights (after 30 days)
