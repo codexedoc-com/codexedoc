@@ -136,29 +136,14 @@ export async function verifyCode(
 
     if (!usernameToUse) {
       throw new Error(
-        "Username is required for registration"
-      );
-    }
-
-    // Double-check username availability
-    const existingUserByUsername =
-      await db.query.users.findFirst({
-        where: eq(
-          users.username,
-          usernameToUse
-        ),
-      });
-
-    if (existingUserByUsername) {
-      throw new Error(
-        "Username is already taken. Please choose another one."
+        "Name is required for registration"
       );
     }
 
     const [newUser] = await db
       .insert(users)
       .values({
-        username: usernameToUse,
+        username: usernameToUse.trim(),
         email,
         emailVerified: true,
       })

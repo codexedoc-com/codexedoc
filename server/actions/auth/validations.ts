@@ -1,7 +1,3 @@
-import { db } from "@/server/db/db";
-import { users } from "@/server/db/schema";
-import { eq } from "drizzle-orm";
-
 import { USERNAME_REGEX } from "./constants";
 
 export function validateEmail(email?: string) {
@@ -18,28 +14,18 @@ export function validateEmail(email?: string) {
 
 export async function validateUsername(username?: string) {
   if (!username) {
-    throw new Error("Username is required");
+    throw new Error("Name is required");
   }
 
-  if (username.length < 3 || username.length > 20) {
-    throw new Error(
-      "Username must be 3-20 characters long"
-    );
+  const trimmed = username.trim();
+
+  if (trimmed.length < 2 || trimmed.length > 50) {
+    throw new Error("Name must be between 2 and 50 characters long");
   }
 
-  if (!USERNAME_REGEX.test(username)) {
+  if (!USERNAME_REGEX.test(trimmed)) {
     throw new Error(
-      "Username can only contain letters, numbers, underscores (_), and hyphens (-)"
-    );
-  }
-
-  const existingUsername = await db.query.users.findFirst({
-    where: eq(users.username, username),
-  });
-
-  if (existingUsername) {
-    throw new Error(
-      "Username is already taken. Please choose another one."
+      "Name can only contain letters, numbers, spaces, hyphens, periods, and apostrophes"
     );
   }
 }
