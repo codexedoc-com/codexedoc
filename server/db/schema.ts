@@ -241,3 +241,31 @@ export const dailyProgress = pgTable("daily_progress", {
 
   minutesStudied: integer("minutes_studied").default(0),
 });
+
+/* =========================
+SOURCE MATERIALS / DOCUMENTS
+========================= */
+
+export const sourceMaterials = pgTable("source_materials", {
+  id: uuid("id").defaultRandom().primaryKey(),
+
+  userId: uuid("user_id")
+  .notNull()
+  .references(() => users.id, { onDelete: "cascade" }),
+
+  goalId: uuid("goal_id")
+  .references(() => goals.id, { onDelete: "cascade" }),
+
+  title: text("title").notNull(),
+
+  fileType: text("file_type").notNull(), // pdf | video | audio | docx | text
+
+  extractedText: text("extracted_text").notNull(), // Full summary / transcript / structured notes
+
+  summary: text("summary"), // High-level executive overview
+
+  createdAt: timestamp("created_at", { mode: "date" })
+  .defaultNow()
+  .notNull(),
+});
+

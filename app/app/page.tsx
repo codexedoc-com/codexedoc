@@ -28,6 +28,8 @@ import AddItemForm from "@/components/AddItemForm";
 import CreateCategoryModal from "@/components/CreateCategoryModal";
 import { StudySessionModal } from "@/components/StudySessionModal";
 import { CategoryDetailModal } from "@/components/CategoryDetailModal";
+import { DocumentUploadModal } from "@/components/DocumentUploadModal";
+import { SavedSourcesModal } from "@/components/SavedSourcesModal";
 
 import { getCurrentUser } from "@/lib/getCurrentUser";
 import { logoutAction } from "@/server/actions/auth/logout";
@@ -70,6 +72,8 @@ export default function DashboardPage() {
   const [showAddItemModal, setShowAddItemModal] = useState(false);
   const [showCreateCategoryModal, setShowCreateCategoryModal] = useState(false);
   const [showStudyModal, setShowStudyModal] = useState(false);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [showSourcesModal, setShowSourcesModal] = useState(false);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [selectedCategoryName, setSelectedCategoryName] = useState<string | undefined>(undefined);
   const [activeCategoryDetailId, setActiveCategoryDetailId] = useState<string | null>(null);
@@ -188,23 +192,32 @@ export default function DashboardPage() {
           {/* Nav Actions */}
           <div className="flex items-center gap-2 sm:gap-3">
             <button
+              onClick={() => setShowUploadModal(true)}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-500 shadow-xs transition cursor-pointer"
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+              <span>AI Auto-Generate</span>
+            </button>
+
+            <button
               onClick={() => {
                 setSelectedCategoryId(null);
                 setSelectedCategoryName(undefined);
                 setShowStudyModal(true);
               }}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-500 shadow-xs transition cursor-pointer"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-zinc-200 bg-white text-zinc-700 text-xs font-semibold hover:bg-zinc-50 shadow-xs transition cursor-pointer"
             >
-              <Brain className="h-3.5 w-3.5" />
+              <Brain className="h-3.5 w-3.5 text-indigo-600" />
               <span>Review ({data.todayStats.reviewsDue})</span>
             </button>
 
             <button
-              onClick={() => setShowAddItemModal(true)}
+              onClick={() => setShowSourcesModal(true)}
               className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-zinc-200 bg-white text-zinc-700 text-xs font-semibold hover:bg-zinc-50 transition cursor-pointer"
+              title="View Document Knowledge Base"
             >
-              <Plus className="h-3.5 w-3.5" />
-              <span>Add Card</span>
+              <BookOpen className="h-3.5 w-3.5 text-zinc-500" />
+              <span>Documents</span>
             </button>
 
             <div className="h-4 w-px bg-zinc-200" />
@@ -287,8 +300,16 @@ export default function DashboardPage() {
           {/* Right Column (1 Col) - Analytics & Quick Controls */}
           <div className="space-y-6">
             {/* Quick Actions Card */}
-            <div className="p-5 rounded-2xl border border-zinc-200/80 bg-white shadow-xs space-y-3">
+            <div className="p-5 rounded-2xl border border-zinc-200/80 bg-white shadow-xs space-y-2.5">
               <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Quick Actions</p>
+
+              <button
+                onClick={() => setShowUploadModal(true)}
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-500 transition cursor-pointer shadow-xs"
+              >
+                <Sparkles className="h-4 w-4" />
+                Auto-Generate from Document/Video
+              </button>
 
               <button
                 onClick={() => {
@@ -296,9 +317,9 @@ export default function DashboardPage() {
                   setSelectedCategoryName(undefined);
                   setShowStudyModal(true);
                 }}
-                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-500 transition cursor-pointer shadow-xs"
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-zinc-200 bg-white text-zinc-800 font-semibold text-sm hover:bg-zinc-50 transition cursor-pointer"
               >
-                <Brain className="h-4 w-4" />
+                <Brain className="h-4 w-4 text-indigo-600" />
                 Start Flashcard Session
               </button>
 
@@ -307,7 +328,7 @@ export default function DashboardPage() {
                 className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-zinc-200 bg-white text-zinc-800 font-semibold text-sm hover:bg-zinc-50 transition cursor-pointer"
               >
                 <Plus className="h-4 w-4" />
-                Add Knowledge Card
+                Add Single Card
               </button>
 
               <button
@@ -315,7 +336,15 @@ export default function DashboardPage() {
                 className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-zinc-200 bg-white text-zinc-800 font-semibold text-sm hover:bg-zinc-50 transition cursor-pointer"
               >
                 <Layers className="h-4 w-4" />
-                Add Topic / Module
+                Add Topic Module
+              </button>
+
+              <button
+                onClick={() => setShowSourcesModal(true)}
+                className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-semibold text-zinc-500 hover:text-zinc-800 hover:bg-zinc-50 transition cursor-pointer pt-1"
+              >
+                <BookOpen className="h-3.5 w-3.5" />
+                View Saved Document Sources
               </button>
             </div>
 
@@ -329,6 +358,29 @@ export default function DashboardPage() {
       </div>
 
       {/* Modals */}
+      {showUploadModal && data.goal?.id && (
+        <DocumentUploadModal
+          goalId={data.goal.id}
+          goalTitle={data.goal.title}
+          onClose={() => setShowUploadModal(false)}
+          onSuccess={() => {
+            setShowUploadModal(false);
+            loadDashboard();
+          }}
+        />
+      )}
+
+      {showSourcesModal && data.goal?.id && (
+        <SavedSourcesModal
+          goalId={data.goal.id}
+          onClose={() => setShowSourcesModal(false)}
+          onRegenerateCards={(docTitle, categories) => {
+            setShowSourcesModal(false);
+            loadDashboard();
+          }}
+        />
+      )}
+
       {showStudyModal && data.user?.id && (
         <StudySessionModal
           userId={data.user.id}
