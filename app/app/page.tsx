@@ -16,6 +16,8 @@ import {
   BookOpen,
   Menu,
   X,
+  User,
+  Compass,
 } from "lucide-react";
 
 import { TodayProgress } from "@/components/TodayProgress";
@@ -74,6 +76,8 @@ export default function DashboardPage() {
   const [showStudyModal, setShowStudyModal] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showSourcesModal, setShowSourcesModal] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [selectedCategoryName, setSelectedCategoryName] = useState<string | undefined>(undefined);
   const [activeCategoryDetailId, setActiveCategoryDetailId] = useState<string | null>(null);
@@ -154,7 +158,7 @@ export default function DashboardPage() {
 
   if (data.loading) {
     return (
-      <main className="min-h-screen bg-[#fafafa] flex items-center justify-center">
+      <main className="min-h-screen bg-[#fafafa] flex items-center justify-center p-4">
         <div className="text-center">
           <div className="inline-block h-8 w-8 rounded-full border-2 border-indigo-600/20 border-t-indigo-600 animate-spin" />
           <p className="mt-3 text-sm text-zinc-500 font-medium">Loading your learning workspace...</p>
@@ -164,33 +168,33 @@ export default function DashboardPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#fafafa] text-zinc-900 pb-16">
+    <main className="min-h-screen bg-[#fafafa] text-zinc-900 pb-24 sm:pb-16 overflow-x-hidden">
       {/* Top Navbar */}
-      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-zinc-200/80">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
+      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-zinc-200/80">
+        <div className="mx-auto flex h-14 sm:h-16 max-w-6xl items-center justify-between px-3.5 sm:px-6">
           {/* Brand & Goal Pill */}
-          <div className="flex items-center gap-4 min-w-0">
-            <Link href="/app" className="flex items-center gap-2.5 flex-shrink-0">
-              <div className="h-8 w-8 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-xs shadow-indigo-200">
+          <div className="flex items-center gap-2.5 sm:gap-4 min-w-0">
+            <Link href="/app" className="flex items-center gap-2 flex-shrink-0">
+              <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg sm:rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-xs shadow-indigo-200">
                 <Brain className="h-4 w-4" />
               </div>
-              <span className="text-sm font-bold tracking-tight text-zinc-900 hidden sm:inline">CODEXEDOC</span>
+              <span className="text-sm font-bold tracking-tight text-zinc-900">CODEXEDOC</span>
             </Link>
 
             {data.goal && (
-              <div className="h-4 w-px bg-zinc-200 hidden sm:block" />
+              <div className="h-4 w-px bg-zinc-200 hidden md:block" />
             )}
 
             {data.goal && (
-              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200/60 text-xs font-semibold text-zinc-800 max-w-[200px] sm:max-w-xs truncate">
+              <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200/60 text-xs font-semibold text-zinc-800 max-w-[220px] truncate">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 flex-shrink-0" />
                 <span className="truncate">{data.goal.title}</span>
               </div>
             )}
           </div>
 
-          {/* Nav Actions */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          {/* Desktop Nav Actions */}
+          <div className="hidden sm:flex items-center gap-2 sm:gap-3">
             <button
               onClick={() => setShowUploadModal(true)}
               className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-500 shadow-xs transition cursor-pointer"
@@ -205,7 +209,7 @@ export default function DashboardPage() {
                 setSelectedCategoryName(undefined);
                 setShowStudyModal(true);
               }}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-zinc-200 bg-white text-zinc-700 text-xs font-semibold hover:bg-zinc-50 shadow-xs transition cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-zinc-200 bg-white text-zinc-700 text-xs font-semibold hover:bg-zinc-50 shadow-xs transition cursor-pointer"
             >
               <Brain className="h-3.5 w-3.5 text-indigo-600" />
               <span>Review ({data.todayStats.reviewsDue})</span>
@@ -213,7 +217,7 @@ export default function DashboardPage() {
 
             <button
               onClick={() => setShowSourcesModal(true)}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-zinc-200 bg-white text-zinc-700 text-xs font-semibold hover:bg-zinc-50 transition cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-zinc-200 bg-white text-zinc-700 text-xs font-semibold hover:bg-zinc-50 transition cursor-pointer"
               title="View Document Knowledge Base"
             >
               <BookOpen className="h-3.5 w-3.5 text-zinc-500" />
@@ -232,34 +236,135 @@ export default function DashboardPage() {
               <LogOut className="h-4 w-4" />
             </button>
           </div>
+
+          {/* Mobile Top Actions */}
+          <div className="flex sm:hidden items-center gap-2">
+            <button
+              onClick={() => {
+                setSelectedCategoryId(null);
+                setSelectedCategoryName(undefined);
+                setShowStudyModal(true);
+              }}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-500 transition cursor-pointer"
+            >
+              <Brain className="h-3.5 w-3.5" />
+              <span>Review ({data.todayStats.reviewsDue})</span>
+            </button>
+
+            <button
+              onClick={() => setShowMobileMenu(!showMobileMenu)}
+              className="p-1.5 rounded-lg text-zinc-600 hover:bg-zinc-100 transition cursor-pointer"
+              title="Open Menu"
+            >
+              {showMobileMenu ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Dropdown Menu Sheet */}
+        {showMobileMenu && (
+          <div className="sm:hidden border-t border-zinc-200 bg-white px-4 py-3 space-y-2 shadow-md">
+            {data.goal && (
+              <div className="py-2 border-b border-zinc-100">
+                <span className="text-[10px] uppercase font-bold text-zinc-400">Current Goal</span>
+                <p className="text-xs font-semibold text-zinc-900 truncate">{data.goal.title}</p>
+              </div>
+            )}
+
+            <button
+              onClick={() => {
+                setShowMobileMenu(false);
+                setShowUploadModal(true);
+              }}
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-indigo-700 bg-indigo-50 transition cursor-pointer"
+            >
+              <Sparkles className="h-4 w-4" />
+              <span>AI Auto-Generate from Document/Media</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setShowMobileMenu(false);
+                setShowSourcesModal(true);
+              }}
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-zinc-700 hover:bg-zinc-50 transition cursor-pointer"
+            >
+              <BookOpen className="h-4 w-4 text-zinc-500" />
+              <span>Document Knowledge Base</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setShowMobileMenu(false);
+                setShowAddItemModal(true);
+              }}
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-zinc-700 hover:bg-zinc-50 transition cursor-pointer"
+            >
+              <Plus className="h-4 w-4 text-zinc-500" />
+              <span>Add Knowledge Card</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setShowMobileMenu(false);
+                setShowCreateCategoryModal(true);
+              }}
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-zinc-700 hover:bg-zinc-50 transition cursor-pointer"
+            >
+              <Layers className="h-4 w-4 text-zinc-500" />
+              <span>Add Topic Module</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setShowMobileMenu(false);
+                router.push(`/create?userId=${data.user?.id || ""}`);
+              }}
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-zinc-700 hover:bg-zinc-50 transition cursor-pointer"
+            >
+              <Compass className="h-4 w-4 text-zinc-500" />
+              <span>Change Learning Goal</span>
+            </button>
+
+            <div className="pt-2 border-t border-zinc-100 flex items-center justify-between text-xs text-zinc-500">
+              <span className="truncate">{data.user?.username || data.user?.email}</span>
+              <button
+                onClick={handleLogout}
+                className="text-rose-600 font-semibold inline-flex items-center gap-1 cursor-pointer"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+                Sign Out
+              </button>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Main Container */}
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 pt-8">
+      <div className="mx-auto max-w-6xl px-3.5 sm:px-6 pt-5 sm:pt-8">
         {/* Goal Hero Banner */}
-        <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-2xl bg-white border border-zinc-200/80 shadow-xs">
+        <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-4 sm:p-6 rounded-2xl bg-white border border-zinc-200/80 shadow-xs">
           <div>
-            <div className="flex items-center gap-2 text-xs font-medium text-zinc-500 mb-1">
-              <span>Active Learning Goal</span>
+            <div className="flex items-center gap-2 text-[11px] sm:text-xs font-medium text-zinc-500 mb-1">
+              <span>Active Goal</span>
               <span>•</span>
               <span className="text-indigo-600 font-semibold">{data.goal?.dailyMinutes || 30} mins daily</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900">
+            <h1 className="text-xl sm:text-3xl font-bold tracking-tight text-zinc-900 break-words">
               {data.goal?.title}
             </h1>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 pt-1 sm:pt-0">
             <button
               onClick={() => router.push(`/create?userId=${data.user?.id || ""}`)}
-              className="px-3.5 py-2 rounded-xl border border-zinc-200 bg-zinc-50 text-zinc-700 text-xs font-semibold hover:bg-zinc-100 transition cursor-pointer"
+              className="flex-1 sm:flex-none px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl border border-zinc-200 bg-zinc-50 text-zinc-700 text-xs font-semibold hover:bg-zinc-100 transition cursor-pointer text-center"
             >
               Change Goal
             </button>
             <button
               onClick={() => setShowCreateCategoryModal(true)}
-              className="px-3.5 py-2 rounded-xl bg-zinc-900 text-white text-xs font-semibold hover:bg-zinc-800 transition cursor-pointer shadow-xs"
+              className="flex-1 sm:flex-none px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-zinc-900 text-white text-xs font-semibold hover:bg-zinc-800 transition cursor-pointer shadow-xs text-center"
             >
               + New Topic
             </button>
@@ -267,9 +372,9 @@ export default function DashboardPage() {
         </div>
 
         {/* Dashboard Grid */}
-        <div className="grid gap-8 lg:grid-cols-3">
-          {/* Left Column (2 Cols) - Study & Topics */}
-          <div className="lg:col-span-2 space-y-8">
+        <div className="grid gap-6 sm:gap-8 lg:grid-cols-3">
+          {/* Left Column (2 Cols on desktop) - Study & Topics */}
+          <div className="lg:col-span-2 space-y-6 sm:space-y-8">
             {/* Daily Queue */}
             <TodayProgress
               {...data.todayStats}
@@ -297,15 +402,15 @@ export default function DashboardPage() {
             <SkillTree treeData={data.skillTree} />
           </div>
 
-          {/* Right Column (1 Col) - Analytics & Quick Controls */}
+          {/* Right Column (1 Col on desktop) - Analytics & Quick Controls */}
           <div className="space-y-6">
             {/* Quick Actions Card */}
-            <div className="p-5 rounded-2xl border border-zinc-200/80 bg-white shadow-xs space-y-2.5">
+            <div className="p-4 sm:p-5 rounded-2xl border border-zinc-200/80 bg-white shadow-xs space-y-2.5">
               <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Quick Actions</p>
 
               <button
                 onClick={() => setShowUploadModal(true)}
-                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-500 transition cursor-pointer shadow-xs"
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-500 transition cursor-pointer shadow-xs active:scale-[0.99]"
               >
                 <Sparkles className="h-4 w-4" />
                 Auto-Generate from Document/Video
@@ -317,7 +422,7 @@ export default function DashboardPage() {
                   setSelectedCategoryName(undefined);
                   setShowStudyModal(true);
                 }}
-                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-zinc-200 bg-white text-zinc-800 font-semibold text-sm hover:bg-zinc-50 transition cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-zinc-200 bg-white text-zinc-800 font-semibold text-sm hover:bg-zinc-50 transition cursor-pointer active:scale-[0.99]"
               >
                 <Brain className="h-4 w-4 text-indigo-600" />
                 Start Flashcard Session
@@ -325,7 +430,7 @@ export default function DashboardPage() {
 
               <button
                 onClick={() => setShowAddItemModal(true)}
-                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-zinc-200 bg-white text-zinc-800 font-semibold text-sm hover:bg-zinc-50 transition cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-zinc-200 bg-white text-zinc-800 font-semibold text-sm hover:bg-zinc-50 transition cursor-pointer active:scale-[0.99]"
               >
                 <Plus className="h-4 w-4" />
                 Add Single Card
@@ -333,7 +438,7 @@ export default function DashboardPage() {
 
               <button
                 onClick={() => setShowCreateCategoryModal(true)}
-                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-zinc-200 bg-white text-zinc-800 font-semibold text-sm hover:bg-zinc-50 transition cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-zinc-200 bg-white text-zinc-800 font-semibold text-sm hover:bg-zinc-50 transition cursor-pointer active:scale-[0.99]"
               >
                 <Layers className="h-4 w-4" />
                 Add Topic Module
@@ -356,6 +461,52 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Mobile Bottom Navigation Bar */}
+      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-zinc-200/90 py-2 px-4 flex items-center justify-around shadow-lg">
+        <button
+          onClick={() => {
+            setSelectedCategoryId(null);
+            setSelectedCategoryName(undefined);
+            setShowStudyModal(true);
+          }}
+          className="flex flex-col items-center gap-0.5 text-indigo-600 cursor-pointer"
+        >
+          <div className="relative">
+            <Brain className="h-5 w-5" />
+            {data.todayStats.reviewsDue > 0 && (
+              <span className="absolute -top-1 -right-1.5 h-3.5 w-3.5 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center">
+                {data.todayStats.reviewsDue}
+              </span>
+            )}
+          </div>
+          <span className="text-[10px] font-semibold">Study</span>
+        </button>
+
+        <button
+          onClick={() => setShowUploadModal(true)}
+          className="flex flex-col items-center gap-0.5 text-zinc-600 hover:text-indigo-600 cursor-pointer"
+        >
+          <Sparkles className="h-5 w-5" />
+          <span className="text-[10px] font-medium">AI Generate</span>
+        </button>
+
+        <button
+          onClick={() => setShowAddItemModal(true)}
+          className="flex flex-col items-center gap-0.5 text-zinc-600 hover:text-indigo-600 cursor-pointer"
+        >
+          <Plus className="h-5 w-5" />
+          <span className="text-[10px] font-medium">Add Card</span>
+        </button>
+
+        <button
+          onClick={() => setShowSourcesModal(true)}
+          className="flex flex-col items-center gap-0.5 text-zinc-600 hover:text-indigo-600 cursor-pointer"
+        >
+          <BookOpen className="h-5 w-5" />
+          <span className="text-[10px] font-medium">Sources</span>
+        </button>
+      </nav>
 
       {/* Modals */}
       {showUploadModal && data.goal?.id && (
