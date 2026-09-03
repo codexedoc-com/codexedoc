@@ -51,11 +51,21 @@ export function DocumentUploadModal({
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const handleFileSelect = (selectedFile: File) => {
+    if (selectedFile.size > 50 * 1024 * 1024) {
+      setError("File exceeds the 50MB limit. Please select a file under 50MB.");
+      setFile(null);
+      return;
+    }
+    setError(null);
+    setFile(selectedFile);
+  };
+
   const handleFileDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setDragOver(false);
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setFile(e.dataTransfer.files[0]);
+      handleFileSelect(e.dataTransfer.files[0]);
     }
   };
 
@@ -64,18 +74,28 @@ export function DocumentUploadModal({
     setError(null);
     setStep("processing");
 
-    const formData = new FormData();
-    formData.append("file", file);
-    if (goalTitle) formData.append("goalTitle", goalTitle);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      if (goalTitle) formData.append("goalTitle", goalTitle);
 
-    const res = await parseUploadedDocumentAction(formData);
+      const res = await parseUploadedDocumentAction(formData);
 
-    if (res.success && res.data) {
-      setDraftResult(res.data);
-      setCategories(res.data.categories || []);
-      setStep("review");
-    } else {
-      setError(res.error || "Failed to analyze document. Please try again.");
+      if (res.success && res.data) {
+        setDraftResult(res.data);
+        setCategories(res.data.categories || []);
+        setStep("review");
+      } else {
+        setError(res.error || "Failed to analyze document. Please try again.");
+        setStep("upload");
+      }
+    } catch (err) {
+      console.error("Upload processing error:", err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "An unexpected error occurred during processing. Please try again."
+      );
       setStep("upload");
     }
   };
@@ -194,7 +214,7 @@ export function DocumentUploadModal({
                   type="file"
                   onChange={(e) => {
                     if (e.target.files && e.target.files[0]) {
-                      setFile(e.target.files[0]);
+                      handleFileSelect(e.target.files[0]);
                     }
                   }}
                   accept=".pdf,.docx,.doc,.txt,.md,.mp3,.wav,.m4a,.ogg,.mp4,.webm,.mov"
