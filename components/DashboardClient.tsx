@@ -127,12 +127,12 @@ export function DashboardClient({ initialData }: { initialData: DashboardInitial
           {/* Brand & Goal Pill */}
           <div className="flex items-center gap-2.5 sm:gap-4 min-w-0">
             <Link href="/app" className="flex items-center gap-2.5 flex-shrink-0">
-              <div className="relative h-7 w-7 sm:h-8 sm:w-8 overflow-hidden rounded-lg sm:rounded-xl border border-zinc-200/80 bg-white shadow-xs flex-shrink-0">
+              <div className="relative h-7 w-7 sm:h-8 sm:w-8 overflow-hidden rounded-lg sm:rounded-xl border border-zinc-800/80 bg-zinc-900 shadow-xs flex-shrink-0">
                 <Image
                   src="/codexedoc.png"
                   alt="CODEXEDOC Logo"
                   fill
-                  className="object-contain p-0.5"
+                  className="object-contain p-1"
                   priority
                 />
               </div>

@@ -17,12 +17,12 @@ export default async function CreateGoalPage() {
     <div className="min-h-screen bg-[#fafafa] flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="mb-6 text-center">
         <Link href="/app" className="inline-flex items-center gap-2.5">
-          <div className="relative h-10 w-10 overflow-hidden rounded-xl border border-zinc-200/80 bg-white shadow-xs">
+          <div className="relative h-11 w-11 overflow-hidden rounded-xl border border-zinc-800/80 bg-zinc-900 shadow-sm">
             <Image
               src="/codexedoc.png"
               alt="CODEXEDOC Logo"
               fill
-              className="object-contain p-0.5"
+              className="object-contain p-1.5"
               priority
             />
           </div>

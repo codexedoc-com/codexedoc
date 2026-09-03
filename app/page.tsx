@@ -68,12 +68,12 @@ export default function LandingPage() {
       <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-zinc-200/80">
         <div className="mx-auto flex h-14 sm:h-16 max-w-7xl items-center justify-between px-4 sm:px-6 relative">
           <Link href="/" className="flex items-center gap-3">
-            <div className="relative h-8 w-8 sm:h-9 sm:w-9 overflow-hidden rounded-xl border border-zinc-200/80 bg-white shadow-xs flex-shrink-0">
+            <div className="relative h-8 w-8 sm:h-9 sm:w-9 overflow-hidden rounded-xl border border-zinc-800/80 bg-zinc-900 shadow-xs flex-shrink-0">
               <Image
                 src="/codexedoc.png"
                 alt="CODEXEDOC Logo"
                 fill
-                className="object-contain p-0.5"
+                className="object-contain p-1"
                 priority
               />
             </div>
