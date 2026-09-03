@@ -8,6 +8,7 @@ import {
   getStatistics,
   getSkillTree,
   getLearningInsights,
+  getReflections,
 } from '@/server/queries/appQueries';
 
 export async function fetchActiveGoal(userId: string) {
@@ -37,3 +38,8 @@ export async function fetchSkillTree(userId: string) {
 export async function fetchLearningInsights(userId: string) {
   return getLearningInsights(userId);
 }
+
+export async function fetchReflections(userId: string) {
+  return getReflections(userId);
+}
+

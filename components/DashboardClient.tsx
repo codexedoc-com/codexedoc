@@ -11,6 +11,7 @@ import {
   Sparkles,
   Layers,
   BookOpen,
+  BookMarked,
   Menu,
   X,
   Compass,
@@ -28,6 +29,7 @@ import { StudySessionModal } from "@/components/StudySessionModal";
 import { CategoryDetailModal } from "@/components/CategoryDetailModal";
 import { DocumentUploadModal } from "@/components/DocumentUploadModal";
 import { SavedSourcesModal } from "@/components/SavedSourcesModal";
+import { ReflectionJournalModal } from "@/components/ReflectionJournalModal";
 
 import { logoutAction } from "@/server/actions/auth/logout";
 import {
@@ -70,6 +72,7 @@ export function DashboardClient({ initialData }: { initialData: DashboardInitial
   const [showStudyModal, setShowStudyModal] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showSourcesModal, setShowSourcesModal] = useState(false);
+  const [showJournalModal, setShowJournalModal] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
@@ -182,6 +185,15 @@ export function DashboardClient({ initialData }: { initialData: DashboardInitial
               <span>Documents</span>
             </button>
 
+            <button
+              onClick={() => setShowJournalModal(true)}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-zinc-200 bg-white text-zinc-700 text-xs font-semibold hover:bg-zinc-50 transition cursor-pointer"
+              title="View Reflection Journal"
+            >
+              <BookMarked className="h-3.5 w-3.5 text-zinc-500" />
+              <span>Journal</span>
+            </button>
+
             <div className="h-4 w-px bg-zinc-200" />
 
             {/* Logout button */}
@@ -249,6 +261,17 @@ export function DashboardClient({ initialData }: { initialData: DashboardInitial
             >
               <BookOpen className="h-4 w-4 text-zinc-500" />
               <span>Document Knowledge Base</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setShowMobileMenu(false);
+                setShowJournalModal(true);
+              }}
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-zinc-700 hover:bg-zinc-50 transition cursor-pointer"
+            >
+              <BookMarked className="h-4 w-4 text-zinc-500" />
+              <span>Reflection Journal</span>
             </button>
 
             <button
@@ -404,6 +427,14 @@ export function DashboardClient({ initialData }: { initialData: DashboardInitial
                 <BookOpen className="h-3.5 w-3.5" />
                 View Saved Document Sources
               </button>
+
+              <button
+                onClick={() => setShowJournalModal(true)}
+                className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-semibold text-zinc-500 hover:text-zinc-800 hover:bg-zinc-50 transition cursor-pointer"
+              >
+                <BookMarked className="h-3.5 w-3.5" />
+                View Reflection Journal
+              </button>
             </div>
 
             <ProgressAnalytics {...data.progressStats} />
@@ -540,6 +571,19 @@ export function DashboardClient({ initialData }: { initialData: DashboardInitial
           onCreated={() => {
             setShowCreateCategoryModal(false);
             refreshDashboard();
+          }}
+        />
+      )}
+
+      {showJournalModal && (
+        <ReflectionJournalModal
+          userId={data.user.id}
+          onClose={() => setShowJournalModal(false)}
+          onStartSession={() => {
+            setShowJournalModal(false);
+            setSelectedCategoryId(null);
+            setSelectedCategoryName(undefined);
+            setShowStudyModal(true);
           }}
         />
       )}

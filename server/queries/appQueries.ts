@@ -7,6 +7,7 @@ import {
   reviews,
   dailyProgress,
   studySessions,
+  reflections,
 } from "@/server/db/schema";
 import { eq, and, desc, gte, lte, type InferSelectModel } from "drizzle-orm";
 
@@ -405,3 +406,39 @@ export async function getLearningInsights(userId: string) {
     };
   }
 }
+
+// Fetch user reflection journal history
+export async function getReflections(userId: string) {
+  if (!isValidUUID(userId)) return [];
+  try {
+    const userReflections = await db.query.reflections.findMany({
+      where: eq(reflections.userId, userId),
+      orderBy: [desc(reflections.createdAt)],
+    });
+
+    const sessions = await db.query.studySessions.findMany({
+      where: eq(studySessions.userId, userId),
+    });
+
+    const sessionMap = new Map(sessions.map((s) => [s.id, s]));
+
+    return userReflections.map((ref) => {
+      const session = sessionMap.get(ref.sessionId);
+      return {
+        id: ref.id,
+        sessionId: ref.sessionId,
+        learned: ref.learned,
+        difficulty: ref.difficulty,
+        confusion: ref.confusion,
+        improvement: ref.improvement,
+        focusTomorrow: ref.focusTomorrow,
+        createdAt: ref.createdAt,
+        durationMinutes: session?.durationMinutes || 0,
+      };
+    });
+  } catch (error) {
+    console.error("Error fetching reflections:", error);
+    return [];
+  }
+}
+
