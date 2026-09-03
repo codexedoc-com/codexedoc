@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -125,9 +126,15 @@ export function DashboardClient({ initialData }: { initialData: DashboardInitial
         <div className="mx-auto flex h-14 sm:h-16 max-w-6xl items-center justify-between px-3.5 sm:px-6">
           {/* Brand & Goal Pill */}
           <div className="flex items-center gap-2.5 sm:gap-4 min-w-0">
-            <Link href="/app" className="flex items-center gap-2 flex-shrink-0">
-              <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg sm:rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-xs shadow-indigo-200">
-                <Brain className="h-4 w-4" />
+            <Link href="/app" className="flex items-center gap-2.5 flex-shrink-0">
+              <div className="relative h-7 w-7 sm:h-8 sm:w-8 overflow-hidden rounded-lg sm:rounded-xl border border-zinc-200/80 bg-white shadow-xs flex-shrink-0">
+                <Image
+                  src="/codexedoc.png"
+                  alt="CODEXEDOC Logo"
+                  fill
+                  className="object-contain p-0.5"
+                  priority
+                />
               </div>
               <span className="text-sm font-bold tracking-tight text-zinc-900">CODEXEDOC</span>
             </Link>

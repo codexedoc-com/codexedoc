@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import {
   ArrowRight,
   Brain,
@@ -66,9 +67,15 @@ export default function LandingPage() {
       {/* Top Navbar */}
       <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-zinc-200/80">
         <div className="mx-auto flex h-14 sm:h-16 max-w-7xl items-center justify-between px-4 sm:px-6 relative">
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg sm:rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-xs shadow-indigo-200">
-              <Brain className="h-4 w-4" />
+          <Link href="/" className="flex items-center gap-3">
+            <div className="relative h-8 w-8 sm:h-9 sm:w-9 overflow-hidden rounded-xl border border-zinc-200/80 bg-white shadow-xs flex-shrink-0">
+              <Image
+                src="/codexedoc.png"
+                alt="CODEXEDOC Logo"
+                fill
+                className="object-contain p-0.5"
+                priority
+              />
             </div>
             <span className="text-sm sm:text-base font-bold tracking-tight text-zinc-900">CODEXEDOC</span>
           </Link>

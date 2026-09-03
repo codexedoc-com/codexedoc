@@ -128,8 +128,14 @@ export default function AuthPage() {
       {/* Top Navbar Brand */}
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center mb-6">
         <Link href="/" className="inline-flex items-center gap-2.5 transition hover:opacity-80">
-          <div className="h-9 w-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-sm shadow-indigo-200">
-            <Brain className="h-5 w-5" />
+          <div className="relative h-10 w-10 overflow-hidden rounded-xl border border-zinc-200/80 bg-white shadow-xs">
+            <Image
+              src="/codexedoc.png"
+              alt="CODEXEDOC Logo"
+              fill
+              className="object-contain p-0.5"
+              priority
+            />
           </div>
           <span className="text-xl font-bold tracking-tight text-zinc-900">CODEXEDOC</span>
         </Link>
