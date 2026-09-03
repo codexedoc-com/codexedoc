@@ -23,6 +23,7 @@ interface CategoryDetailModalProps {
   categoryId: string;
   onClose: () => void;
   onAddItem: (categoryId: string) => void;
+  onUploadToCategory?: (categoryId: string, categoryName: string) => void;
   onStartCategoryPractice: (categoryId: string, categoryName: string) => void;
   onCategoryDeleted: () => void;
 }
@@ -31,6 +32,7 @@ export function CategoryDetailModal({
   categoryId,
   onClose,
   onAddItem,
+  onUploadToCategory,
   onStartCategoryPractice,
   onCategoryDeleted,
 }: CategoryDetailModalProps) {
@@ -105,7 +107,7 @@ export function CategoryDetailModal({
 
         {/* Action Bar */}
         <div className="px-4 sm:px-6 py-2.5 sm:py-3 bg-zinc-50 border-b border-zinc-100 flex items-center justify-between gap-2 flex-wrap">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={() => onAddItem(categoryId)}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-500 transition cursor-pointer shadow-xs active:scale-[0.99]"
@@ -113,6 +115,16 @@ export function CategoryDetailModal({
               <Plus className="h-3.5 w-3.5" />
               Add Card
             </button>
+            {onUploadToCategory && (
+              <button
+                onClick={() => onUploadToCategory(categoryId, detail?.name || "")}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-zinc-200 bg-white text-zinc-800 text-xs font-semibold hover:bg-zinc-100 transition cursor-pointer shadow-xs active:scale-[0.99]"
+                title="Upload notes/document to auto-generate cards for this topic"
+              >
+                <Sparkles className="h-3.5 w-3.5 text-indigo-600" />
+                <span>Upload Material (AI)</span>
+              </button>
+            )}
             {detail && detail.items.length > 0 && (
               <button
                 onClick={() => onStartCategoryPractice(categoryId, detail.name)}
@@ -142,14 +154,25 @@ export function CategoryDetailModal({
             <div className="py-12 text-center">
               <Layers className="mx-auto h-10 w-10 text-zinc-300 mb-2" />
               <p className="text-sm font-semibold text-zinc-700">No cards in this topic yet</p>
-              <p className="text-xs text-zinc-400 mt-1">Add flashcards, vocab words, or concepts to start studying.</p>
-              <button
-                onClick={() => onAddItem(categoryId)}
-                className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-500 transition cursor-pointer shadow-xs"
-              >
-                <Plus className="h-3.5 w-3.5" />
-                Add First Card
-              </button>
+              <p className="text-xs text-zinc-400 mt-1">Add flashcards manually or auto-generate them from your notes.</p>
+              <div className="mt-4 flex items-center justify-center gap-2 flex-wrap">
+                <button
+                  onClick={() => onAddItem(categoryId)}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-zinc-200 bg-white text-zinc-800 text-xs font-semibold hover:bg-zinc-50 transition cursor-pointer shadow-xs"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  Add Card Manually
+                </button>
+                {onUploadToCategory && (
+                  <button
+                    onClick={() => onUploadToCategory(categoryId, detail?.name || "")}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-500 transition cursor-pointer shadow-xs active:scale-[0.99]"
+                  >
+                    <Sparkles className="h-3.5 w-3.5" />
+                    Upload Notes & Auto-Generate
+                  </button>
+                )}
+              </div>
             </div>
           ) : (
             detail.items.map((item) => (

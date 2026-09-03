@@ -1,20 +1,27 @@
 "use client";
 
 import { useState } from "react";
-import { X, Sparkles, FolderPlus } from "lucide-react";
+import { X, Sparkles, FolderPlus, Upload } from "lucide-react";
 import { createLearningAreaAction } from "@/server/mutations/appMutations";
 
 interface Props {
   goalId: string;
   onClose?: () => void;
   onCreated?: () => void;
+  onCreateAndUpload?: (category: { id: string; name: string }) => void;
 }
 
-export default function CreateCategoryModal({ goalId, onClose, onCreated }: Props) {
+export default function CreateCategoryModal({
+  goalId,
+  onClose,
+  onCreated,
+  onCreateAndUpload,
+}: Props) {
   const [name, setName] = useState("");
   const [pending, setPending] = useState(false);
+  const [uploadPending, setUploadPending] = useState(false);
 
-  const handleCreate = async () => {
+  const handleCreateOnly = async () => {
     if (!name.trim()) return;
     setPending(true);
     try {
@@ -30,6 +37,22 @@ export default function CreateCategoryModal({ goalId, onClose, onCreated }: Prop
     setPending(false);
   };
 
+  const handleCreateAndUpload = async () => {
+    if (!name.trim()) return;
+    setUploadPending(true);
+    try {
+      const result = await createLearningAreaAction(goalId, name.trim());
+      if (result?.success && result.category) {
+        onCreateAndUpload?.(result.category);
+      } else if (result?.success) {
+        onCreated?.();
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    setUploadPending(false);
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/60 backdrop-blur-xs p-2 sm:p-4">
       <div className="w-full max-w-md rounded-2xl sm:rounded-3xl border border-zinc-200 bg-white p-4 sm:p-6 shadow-xl">
@@ -40,7 +63,7 @@ export default function CreateCategoryModal({ goalId, onClose, onCreated }: Prop
             </div>
             <div className="min-w-0">
               <h3 className="text-base sm:text-lg font-bold text-zinc-900 truncate">New Learning Topic</h3>
-              <p className="text-[11px] sm:text-xs text-zinc-500 truncate">Group your cards into structured modules.</p>
+              <p className="text-[11px] sm:text-xs text-zinc-500 truncate">Group cards into structured modules.</p>
             </div>
           </div>
           <button
@@ -64,26 +87,38 @@ export default function CreateCategoryModal({ goalId, onClose, onCreated }: Prop
               className="w-full rounded-xl border border-zinc-200 px-3.5 py-2.5 text-xs sm:text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 focus:outline-none"
               autoFocus
               onKeyDown={(e) => {
-                if (e.key === "Enter") handleCreate();
+                if (e.key === "Enter") handleCreateOnly();
               }}
             />
           </div>
         </div>
 
-        <div className="mt-5 sm:mt-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
+        <div className="mt-5 sm:mt-6 flex flex-col sm:flex-row sm:justify-end gap-2">
           <button
             onClick={onClose}
             className="w-full sm:w-auto px-4 py-2.5 rounded-xl text-xs font-semibold text-zinc-600 hover:bg-zinc-100 transition cursor-pointer text-center"
           >
             Cancel
           </button>
+
           <button
-            onClick={handleCreate}
-            disabled={!name.trim() || pending}
-            className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-500 disabled:opacity-50 transition cursor-pointer shadow-xs text-center"
+            onClick={handleCreateOnly}
+            disabled={!name.trim() || pending || uploadPending}
+            className="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-zinc-200 bg-white text-zinc-800 text-xs font-semibold hover:bg-zinc-50 disabled:opacity-50 transition cursor-pointer shadow-xs text-center"
           >
             {pending ? "Creating..." : "Create Topic"}
           </button>
+
+          {onCreateAndUpload && (
+            <button
+              onClick={handleCreateAndUpload}
+              disabled={!name.trim() || pending || uploadPending}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-500 disabled:opacity-50 transition cursor-pointer shadow-xs active:scale-[0.99] text-center"
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+              <span>{uploadPending ? "Creating..." : "Create & Upload Notes"}</span>
+            </button>
+          )}
         </div>
       </div>
     </div>

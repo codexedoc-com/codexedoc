@@ -28,6 +28,8 @@ import { IngestionResult, GeneratedCategory, GeneratedCard } from "@/server/serv
 interface DocumentUploadModalProps {
   goalId: string;
   goalTitle?: string;
+  targetCategoryId?: string;
+  targetCategoryName?: string;
   onClose: () => void;
   onSuccess: () => void;
 }
@@ -35,6 +37,8 @@ interface DocumentUploadModalProps {
 export function DocumentUploadModal({
   goalId,
   goalTitle,
+  targetCategoryId,
+  targetCategoryName,
   onClose,
   onSuccess,
 }: DocumentUploadModalProps) {
@@ -78,12 +82,17 @@ export function DocumentUploadModal({
       const formData = new FormData();
       formData.append("file", file);
       if (goalTitle) formData.append("goalTitle", goalTitle);
+      if (targetCategoryName) formData.append("targetCategoryName", targetCategoryName);
 
       const res = await parseUploadedDocumentAction(formData);
 
       if (res.success && res.data) {
         setDraftResult(res.data);
-        setCategories(res.data.categories || []);
+        const resolvedCats = (res.data.categories || []).map((cat) => ({
+          ...cat,
+          name: targetCategoryName || cat.name,
+        }));
+        setCategories(resolvedCats);
         setStep("review");
       } else {
         setError(res.error || "Failed to analyze document. Please try again.");
@@ -142,6 +151,8 @@ export function DocumentUploadModal({
       summary: draftResult.summary,
       extractedText: draftResult.extractedText,
       categories: categories.filter((c) => c.items.length > 0),
+      targetCategoryId,
+      targetCategoryName,
     };
 
     const res = await saveGeneratedBlueprintAction(payload);
@@ -167,11 +178,19 @@ export function DocumentUploadModal({
             </div>
             <div className="min-w-0">
               <h3 className="text-sm sm:text-base font-bold text-zinc-900 truncate">
-                {step === "review" ? "Review & Customize Generated Cards" : "AI Ingestion & Generation"}
+                {step === "review"
+                  ? "Review & Customize Generated Cards"
+                  : targetCategoryName
+                  ? `AI Generate for "${targetCategoryName}"`
+                  : "AI Ingestion & Generation"}
               </h3>
               <p className="text-[11px] sm:text-xs text-zinc-500 truncate">
                 {step === "review"
-                  ? "Tweak the extracted cards before saving."
+                  ? targetCategoryName
+                    ? `Adding approved cards directly under topic: ${targetCategoryName}`
+                    : "Tweak the extracted cards before saving."
+                  : targetCategoryName
+                  ? `Upload notes or files to auto-create cards for ${targetCategoryName}`
                   : "Upload any PDF, Video, Audio, DOCX, or Text."}
               </p>
             </div>

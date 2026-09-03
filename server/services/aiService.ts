@@ -77,7 +77,8 @@ export async function processDocumentWithAI(
   fileBuffer: Buffer,
   mimeType: string,
   fileName: string,
-  goalContext?: string
+  goalContext?: string,
+  targetTopic?: string
 ): Promise<IngestionResult> {
   const geminiKey = process.env.GEMINI_API_KEY?.trim();
   const openaiKey = process.env.OPENAI_API_KEY?.trim();
@@ -97,9 +98,13 @@ export async function processDocumentWithAI(
       const ai = new GoogleGenAI({ apiKey: geminiKey });
       const base64Data = fileBuffer.toString("base64");
 
-      const promptContext = goalContext
+      let promptContext = goalContext
         ? `The learner's current target goal is "${goalContext}". Tailor the categories and questions to support this goal.`
         : "";
+
+      if (targetTopic) {
+        promptContext += ` All generated flashcards must be categorized strictly under the topic "${targetTopic}". Return "${targetTopic}" as the category name.`;
+      }
 
       const response = await ai.models.generateContent({
         model: "gemini-2.5-flash",
@@ -223,7 +228,7 @@ export async function processDocumentWithAI(
     extractedText: rawContent.slice(0, 3000) || `Extracted text from ${fileName}.`,
     categories: [
       {
-        name: `${cleanTitle} - Core Concepts`,
+        name: targetTopic || `${cleanTitle} - Core Concepts`,
         items: [
           {
             prompt: `What is the primary topic covered in ${cleanTitle}?`,

@@ -134,12 +134,19 @@ export async function createItemAction(
 // Create a learning area with server action
 export async function createLearningAreaAction(goalId: string, name: string) {
   try {
-    await db.insert(learningAreas).values({
-      goalId,
-      name,
-    });
+    const [created] = await db
+      .insert(learningAreas)
+      .values({
+        goalId,
+        name,
+      })
+      .returning();
 
-    return { success: true, message: "Category created successfully" };
+    return {
+      success: true,
+      category: created ? { id: created.id, name: created.name, goalId: created.goalId } : undefined,
+      message: "Category created successfully",
+    };
   } catch (error) {
     console.error("Error creating category:", error);
     return { success: false, error: "Failed to create category" };

@@ -38,6 +38,7 @@ export async function parseUploadedDocumentAction(formData: FormData): Promise<{
     }
 
     const goalTitle = formData.get("goalTitle")?.toString() || undefined;
+    const targetCategoryName = formData.get("targetCategoryName")?.toString() || undefined;
 
     // Convert file to buffer
     const arrayBuffer = await file.arrayBuffer();
@@ -47,7 +48,8 @@ export async function parseUploadedDocumentAction(formData: FormData): Promise<{
       buffer,
       file.type || "application/octet-stream",
       file.name,
-      goalTitle
+      goalTitle,
+      targetCategoryName
     );
 
     return { success: true, data: result };
@@ -67,6 +69,8 @@ export interface SaveBlueprintPayload {
   summary: string;
   extractedText: string;
   categories: GeneratedCategory[];
+  targetCategoryId?: string;
+  targetCategoryName?: string;
 }
 
 /**
@@ -100,21 +104,26 @@ export async function saveGeneratedBlueprintAction(payload: SaveBlueprintPayload
     for (const cat of payload.categories) {
       if (!cat.name || cat.items.length === 0) continue;
 
-      const [createdArea] = await db
-        .insert(learningAreas)
-        .values({
-          goalId: payload.goalId,
-          name: cat.name,
-        })
-        .returning();
+      let areaId = payload.targetCategoryId;
 
-      if (createdArea) {
+      if (!areaId) {
+        const [createdArea] = await db
+          .insert(learningAreas)
+          .values({
+            goalId: payload.goalId,
+            name: cat.name,
+          })
+          .returning();
+        areaId = createdArea?.id;
+      }
+
+      if (areaId) {
         for (const item of cat.items) {
           const [createdItem] = await db
             .insert(items)
             .values({
               userId: user.id,
-              areaId: createdArea.id,
+              areaId: areaId,
               type: item.type || "concept",
               prompt: item.prompt,
               answer: item.answer,

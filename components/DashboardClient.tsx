@@ -77,6 +77,7 @@ export function DashboardClient({ initialData }: { initialData: DashboardInitial
 
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [selectedCategoryName, setSelectedCategoryName] = useState<string | undefined>(undefined);
+  const [uploadTargetCategory, setUploadTargetCategory] = useState<{ id: string; name: string } | null>(null);
   const [activeCategoryDetailId, setActiveCategoryDetailId] = useState<string | null>(null);
 
   const [data, setData] = useState<DashboardInitialData>(initialData);
@@ -494,9 +495,15 @@ export function DashboardClient({ initialData }: { initialData: DashboardInitial
         <DocumentUploadModal
           goalId={data.goal.id}
           goalTitle={data.goal.title}
-          onClose={() => setShowUploadModal(false)}
+          targetCategoryId={uploadTargetCategory?.id}
+          targetCategoryName={uploadTargetCategory?.name}
+          onClose={() => {
+            setShowUploadModal(false);
+            setUploadTargetCategory(null);
+          }}
           onSuccess={() => {
             setShowUploadModal(false);
+            setUploadTargetCategory(null);
             refreshDashboard();
           }}
         />
@@ -534,6 +541,11 @@ export function DashboardClient({ initialData }: { initialData: DashboardInitial
             setSelectedCategoryId(catId);
             setShowAddItemModal(true);
           }}
+          onUploadToCategory={(catId, catName) => {
+            setActiveCategoryDetailId(null);
+            setUploadTargetCategory({ id: catId, name: catName });
+            setShowUploadModal(true);
+          }}
           onStartCategoryPractice={(catId, catName) => {
             setActiveCategoryDetailId(null);
             setSelectedCategoryId(catId);
@@ -570,6 +582,12 @@ export function DashboardClient({ initialData }: { initialData: DashboardInitial
           onClose={() => setShowCreateCategoryModal(false)}
           onCreated={() => {
             setShowCreateCategoryModal(false);
+            refreshDashboard();
+          }}
+          onCreateAndUpload={(cat) => {
+            setShowCreateCategoryModal(false);
+            setUploadTargetCategory(cat);
+            setShowUploadModal(true);
             refreshDashboard();
           }}
         />
