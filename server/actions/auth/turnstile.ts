@@ -13,7 +13,7 @@ import { getClientIp } from "./utils";
  *
  * - **Production Mode** (`USE_AUTH=true` with Turnstile keys configured):
  *   Validates the token against Cloudflare's siteverify endpoint.
- *   Throws on verification failure.
+ *   Throws on verification failure or missing token.
  *
  * The Turnstile secret key (`TURNSTILE_SECRET_KEY`) is NEVER exposed
  * to the client. Only the site key (`NEXT_PUBLIC_TURNSTILE_SITE_KEY`)
@@ -40,41 +40,51 @@ export async function verifyTurnstile(token?: string): Promise<string> {
     siteKey.startsWith("your-") ||
     siteKey === "your-site-key";
 
-  // Community Mode or missing/placeholder configuration: bypass verification
+  // Community Mode or missing/placeholder configuration: bypass verification for local development
   if (!isEnforcedAuth || isPlaceholderSecret || isPlaceholderSite) {
     return getClientIp();
   }
 
-  // If keys are configured but no token was provided, return client IP
-  if (!token) {
-    return getClientIp();
-  }
-
-  // Production Turnstile verification
-  const ipAddress = await getClientIp();
-
-  const response = await fetch(
-    "https://challenges.cloudflare.com/turnstile/v0/siteverify",
-    {
-      method: "POST",
-      body: new URLSearchParams({
-        secret: secretKey,
-        response: token,
-        remoteip: ipAddress,
-      }),
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    }
-  );
-
-  const data = await response.json();
-
-  if (!data.success) {
+  // Production Mode with Turnstile configured: require token
+  if (!token || token.trim() === "") {
     throw new Error(
-      "Bot detection failed. Please refresh and try again."
+      "Verification challenge required. Please complete the security check."
     );
   }
 
-  return ipAddress;
+  // Production Turnstile verification against Cloudflare endpoint
+  const ipAddress = await getClientIp();
+
+  try {
+    const response = await fetch(
+      "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+      {
+        method: "POST",
+        body: new URLSearchParams({
+          secret: secretKey,
+          response: token,
+          remoteip: ipAddress,
+        }),
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+
+    const data = await response.json();
+
+    if (!data.success) {
+      throw new Error(
+        "Bot detection challenge failed. Please refresh and try again."
+      );
+    }
+
+    return ipAddress;
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("challenge")) {
+      throw error;
+    }
+    console.error("[Turnstile] Error during verification:", error);
+    throw new Error("Security verification failed. Please try again.");
+  }
 }

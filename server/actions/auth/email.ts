@@ -11,17 +11,35 @@ export async function sendVerificationEmail(
   email: string,
   code: string
 ): Promise<void> {
+  const isEnforcedAuth = process.env.USE_AUTH === "true";
   const apiKey = process.env.RESEND_API_KEY?.trim();
+  const isPlaceholderKey =
+    !apiKey ||
+    apiKey.includes("placeholder") ||
+    apiKey.startsWith("your-") ||
+    apiKey.startsWith("re_your_");
 
-  if (!apiKey || process.env.USE_AUTH !== "true") {
-    console.log(`[AUTH] Verification code for ${email}: ${code} (expires in ${CODE_EXPIRY_MINUTES}m)`);
+  // Community / Local Development Mode: allow zero-dependency operation
+  if (!isEnforcedAuth) {
+    console.log(
+      `[AUTH:CommunityMode] Verification code for ${email}: ${code} (expires in ${CODE_EXPIRY_MINUTES}m)`
+    );
     return;
   }
 
+  // Production Mode: email service is mandatory
+  if (isPlaceholderKey) {
+    console.error("[Email] RESEND_API_KEY is missing or invalid in Production Mode.");
+    throw new Error("Email service is not configured. Please contact support.");
+  }
+
+  const fromAddress =
+    process.env.EMAIL_FROM?.trim() || "CODEXEDOC <verify@codexedoc.com>";
+
   try {
     const resend = new Resend(apiKey);
-    await resend.emails.send({
-      from: "CODEXEDOC <verify@codexedoc.com>",
+    const result = await resend.emails.send({
+      from: fromAddress,
       replyTo: "contact@codexedoc.com",
       to: email,
       subject: "CODEXEDOC Verification",
@@ -46,8 +64,16 @@ export async function sendVerificationEmail(
         </div>
       `,
     });
+
+    if (result.error) {
+      console.error("[Email] Resend API error:", result.error.message || result.error.name);
+      throw new Error("Failed to send verification email. Please try again.");
+    }
   } catch (error) {
-    console.error("Email error:", error);
+    if (error instanceof Error && (error.message.includes("configured") || error.message.includes("verification email"))) {
+      throw error;
+    }
+    console.error("[Email] Error dispatching email:", error);
     throw new Error("Failed to send verification email. Please try again.");
   }
 }

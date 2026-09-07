@@ -39,6 +39,7 @@ import ItemDetailModal from "@/components/ItemDetailModal";
 import { updateItemAction, deleteItemAction } from "@/server/mutations/appMutations";
 
 import { getCurrentUser } from "@/lib/getCurrentUser";
+import { logoutAction } from "@/server/actions/auth/logout";
 import {
   fetchActiveGoal,
   fetchGoalCategories,
@@ -293,7 +294,11 @@ export default function DashboardPage() {
               <Settings className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
 
-            <button className="hidden sm:flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 rounded-lg sm:rounded-xl border border-white/10 bg-white/5 text-white/60 hover:text-white hover:bg-white/10 transition">
+            <button
+              onClick={() => logoutAction()}
+              title="Log out"
+              className="flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 rounded-lg sm:rounded-xl border border-white/10 bg-white/5 text-white/60 hover:text-white hover:bg-white/10 transition cursor-pointer"
+            >
               <LogOut className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
 
